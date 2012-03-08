@@ -1,0 +1,372 @@
+/* Main CSS File */
+
+
+/* Structure
+----------------------------*/
+
+body,html {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	overflow-y: hidden; /* eliminate scrollbar from appearing during resizing */
+	font-size: 12px;
+	font-family: "Lucida Sans",Helvetica,Arial,Verdana,sans-serif;
+}
+
+#container {
+	width: 100%;
+	height: 100%;
+	min-width: 780px;
+}
+
+
+
+/* Header 
+----------------------------*/
+
+#header {
+	height: 42px;
+	width: 100%;
+	clear: both;
+	/* background: url('../images/header-bg.jpg') repeat-x; /* TODO: make new image with height 42px */
+	/* background-color:#537ca4; dark lue */
+	background-color: #6095bf; /* light blue */
+	/* background-color: #71b439; green */
+}
+
+#logo {
+	height: 100%;
+	padding: 9px 10px;
+}
+
+
+/* Calendar
+----------------------------*/
+
+#calendar-container {
+	float: left;
+	width: 100%;
+	min-width: 500px;
+}
+
+#calendar {
+	margin: 0 auto;
+	margin-right: 280px;
+	position: relative;
+	z-index: 30; /* goes on top of event slider and side bar */
+}
+
+
+/* Sidebar
+----------------------------*/
+
+#sidebar-container {
+	width: 280px;
+	margin-left:-280px;
+	float: right;
+	height: auto; /* dynamically calculated by js */
+	position: relative;
+}
+
+#sidebar-top {
+	min-height: 50px;
+	background: url('/mymedia/images/sidebar-top-bg.jpg');
+}
+
+#sidebar-main {
+	background-color: #F2F2F2;
+}
+
+#sidebar-content {
+	width: 265px;
+	float: right;
+	height: 100%;
+	overflow: hidden;
+}
+
+#calendar-shadow {
+	background: transparent url('/mymedia/images/sidebar-bg-shadow.png') repeat-y; 
+	width: 15px;
+	height: 100%;
+	float: left;
+	position: relative;
+	z-index: 20; /* goes on top of event slider */
+}
+
+textarea#add-event-textbox {
+	width: 247px; 
+	height: 22px;
+	font-size: 13px;
+	padding: 3px 1px 0px 2px;
+	margin: 11px 13px 10px 14px;
+	resize: none;
+	font-family: "Lucida Sans",Helvetica,Arial,Verdana,sans-serif;
+}
+
+/* Sticky Notes 
+---------------------------------------------- */
+	
+#sticky-notes {
+	padding-top:5px;
+}
+
+#sticky-notes .note{
+	margin:5px 2px 2px 0px;
+	background:#f9f8c3; /* yellow temp */
+	position:relative;
+	border:1px solid #ddd;
+	-moz-border-radius:5px;
+	-webkit-border-radius:5px;
+	width: 250px;
+}
+#sticky-notes .note .sticky-note-title{
+	margin:0;
+	min-height: 15px;
+	font-size:12px;
+	padding:5px 25px 5px 5px;
+	background:#fcf6a3; /*dark yellow - temp */
+	color:#000;
+	border-bottom:1px solid #eee;
+	font-family: Verdana;
+	font-weight: bold;
+	cursor:move;
+}
+
+#sticky-notes .note .sticky-note-title-edit {
+	font-family: Verdana;
+	font-size: 12px;
+	font-weight: bold;
+	height: 15px;
+	resize: none;
+	margin: -2px 0px -5px -2px;
+	width: 225px;
+	background-color: #fff;
+	border: none;
+}
+
+#sticky-notes .note-content{
+	background-color: transparent;
+	min-height:100px; 
+	margin:5px;
+	font-family:'Lucida Grande', Verdana; font-size:0.8em; line-height:1.5em;
+}
+#sticky-notes .placeholder{ /* need to change this */
+	background: #f0f0f0;
+	border:1px dashed #ddd;
+}
+
+#sticky-notes .note .sticky-note-title.collapse{
+	background: #fcf6a3 url('/mymedia/images/stickynotes-collapse.png') no-repeat top right;
+}
+
+#sticky-notes textarea {
+	font-size: 14px;
+	width: 100%;
+	background-color: transparent;
+}
+
+#sticky-notes .note-editable {
+	background-color: transparent;
+	border: none;
+	resize: none;
+	font-family: "Chalkboard",Helvetica,Arial,Verdana,sans-serif;
+}
+
+#sticky-notes .note-editable:focus {
+	outline: none;
+}
+
+#add-new-note-box {
+	border: 2px dashed #43494d;
+	margin-top: 10px;
+	padding-top: 25px;
+	width: 250px;
+	height: 50px;
+	border-radius: 15px; /* TODO: rounded corners does not dash. maybe replace with image */
+	cursor: pointer;
+}
+
+#add-new-note-box:hover {
+	background-color: #bfc1c1;
+}
+
+.clear {
+	clear: fixed;
+	height: 20px;
+}
+
+
+/* Event Sliders
+----------------------------*/
+
+#event-slider-container {
+	height: auto; /* dynamically calculated by js */
+  width: 280px;
+	right: 280px;
+	position: absolute;
+	z-index: 10; /* goes on top of sidebar */
+	background-color: #FFF;
+	overflow: hidden;
+}
+
+	/* Event header */
+	
+	#event-slider-container #event-header {
+		background: #d5deec;
+		width: 280px;
+	}
+	
+	#event-header #event-title-container {
+		width: 245px;
+		padding: 12px 20px 10px 15px;
+	}
+
+	#event-header .close-slider {
+		position: absolute;
+		width: 10px;
+		right: 10px;
+		top: 5px;
+		cursor: pointer;
+		color: #888;
+	}
+	
+	#event-header .close-slider:hover {
+		text-decoration: underline;
+		color: #444;
+	}
+
+	/* Event details */
+	
+	#event-content table {
+		border-top: 2px solid #e5e5e5;
+		border-bottom: 2px solid #e5e5e5;
+		vertical-align: middle;
+	}
+	
+	#event-content .first {
+		padding-top: 10px;
+	}
+	
+	#event-content .last {
+		padding-bottom: 10px;
+	}
+	
+	#event-content .detail-name {
+		width: 27%;
+		text-align: right;
+		background-color: #e5e5e5;
+		color: #939292;
+		padding-right: 12px;
+	}
+	
+	#event-content .detail-input {
+		padding-left: 13px;
+	}
+	
+	#event-content .event-color {
+		width: 14px;
+		height: 14px;
+		margin-top:4px;
+		margin-right: 4px;
+		background-color: #ddd;
+		display: inline-block;
+		cursor: pointer;
+	}
+	
+	#event-content .event-color:hover {
+		border: 1px solid black; 
+		margin: 3px 2px -1px 0px;
+	}
+	
+	#event-content .event-color-selected {
+		background: url('/mymedia/images/tick.png');
+	}
+	
+	/* Event input boxes */
+	
+	#event-slider-container textarea#event-title {
+		font-size: 14px;
+		font-weight: bold;
+		width: 235px;
+	}
+	
+	#event-slider-container textarea#event-title:hover {
+		background-color: #b1c2dc;
+	}
+	
+	#event-slider-container textarea#event-title:focus {
+		background-color: white;
+	}
+	
+	#event-slider-container .event-editable {
+		background-color: transparent;
+		border: none;
+		resize: none;
+		font-family: "Lucida Sans",Helvetica,Arial,Verdana,sans-serif;
+		font-size: 12px;
+		height: 14px;
+		width: 170px;
+	}
+	
+	#event-slider-container .event-editable:hover {
+		background-color: #f0f5fa;
+	}
+	
+	#event-slider-container .event-editable:focus{
+		outline: none;
+		background-color: white;
+		box-shadow: 2px 2px 5px #444444;
+		-moz-box-shadow: 2px 2px 5px #444444;
+		-webkit-box-shadow: 2px 2px 5px #444444;
+		/* border: 1px solid red; */
+	}
+	
+	/* Event slider buttons */
+	
+	#event-buttons div {
+		display: inline-block;
+		padding: 5px;
+		margin: 5px;
+	}
+
+	#event-buttons div:hover {
+		background-color: #ddd;
+		cursor: pointer;
+	}
+	
+
+/* Timepicker */
+------------------------------------------------------------------------*/
+
+.ui-timepicker-div .ui-widget-header {
+	margin-bottom: 8px;
+}
+
+.ui-timepicker-div dl {
+	text-align: left;
+}
+
+.ui-timepicker-div dl dt {
+	height: 25px;
+	margin-bottom: -25px;
+}
+
+.ui-timepicker-div dl dd {
+	margin: 0 10px 10px 65px;
+}
+
+.ui-timepicker-div td {
+	font-size: 90%;
+}
+
+.ui-tpicker-grid-label {
+	background: none;
+	border: none;
+	margin: 0;
+	padding: 0;
+}
+
+
