@@ -309,8 +309,11 @@ function EventSlider(calendar, options) {
 				    completeEventCreation();
 				    textbox.resetTextbox(); 
 				    calendar.renderEvent(currentEvent, true);
+						$("#notification-box-container").show().delay(2000).fadeOut();
+						$("#notification-content").html("Successfuly added event to calendar");
 					} else {
-						alert("Error adding event"); //temp solution TODO create a notification box
+						$("#notification-box-container").show().delay(2000).fadeOut();
+						$("#notification-content").html("Error saving event");
 					}
 				},
 				dataType: 'json'

@@ -43,6 +43,39 @@ body {
 }
 
 
+/* Notification Box
+-------------------------------- */
+
+#notification-box-container {
+	display: none;
+	position: absolute;
+	z-index: 999;
+	top: 22px;
+	margin: 0px auto;
+	left: 0;
+	right: 0;
+}
+
+#notification-box {
+	font-weight: bold;
+	padding: 3px 8px;
+	margin: 0px auto;
+	background: #fcf6a3; /* dark yellow - temp */
+	border: 1px solid red;
+	box-shadow: 1px 1px 2px #444444;
+	-moz-box-shadow: 1px 1px 2px #444444;
+	-webkit-box-shadow: 1px 1px 2px #444444;
+}
+
+#notification-content, #notification-close {
+	display: inline-block;
+}
+
+#notification-close {
+	margin-left: 10px;
+}
+
+
 /* Calendar
 ----------------------------*/
 

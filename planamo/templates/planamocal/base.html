@@ -13,6 +13,13 @@
 					<a href="/"><img src="/mymedia/images/logo.png" alt="planamo" /></a>
 				</div>
 			</div>
+			<div id="notification-box-container">
+				<table id="notification-box">
+					<tr>
+						<td><div id="notification-content">Notification</div><div id="notification-close"><a href="#" onClick="$('#notification-box-container').hide();">X</a></div></td>
+					</tr>
+				</table>
+			</div>
 			{% block main_content %}{% endblock %}
 		</div>
 	</body>
