@@ -32,6 +32,10 @@ def createEvent(request):
 			title = obj['title']
 			location = obj.get('location','')
 			allday = obj['allday']
+			if allday == 'false' or allday == '0' or allday == 0 or allday == 'False':
+				allday = False
+			else:
+				allday = True
 			start_date = datetime.strptime(obj['start_date'], 
 				"%a, %d %b %Y %H:%M:%S %Z")
 			end_date = datetime.strptime(obj['end_date'], 
@@ -51,6 +55,14 @@ def createEvent(request):
 		except Http404:
 			print "Calendar doesn't exist"
 			message = {'success': False}
+	else:
+		message = {'success': False}
+	return HttpResponse(simplejson.dumps(message), mimetype='application/json')
+
+@csrf_exempt # temp solution
+def deleteEvent(request):
+	if request.is_ajax() and request.method == 'POST':
+		event = get_object_or_404(Calendar, pk=1)
 	else:
 		message = {'success': False}
 	return HttpResponse(simplejson.dumps(message), mimetype='application/json')
