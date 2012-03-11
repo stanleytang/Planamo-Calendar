@@ -43,6 +43,7 @@ def createEvent(request):
 		
 		# Read in event object
 		try:
+		  # TODO: Is there a way to loop through Event object attributes instead?
 			title = obj['title']
 			location = obj.get('location','')
 			allday = obj['allday']
