@@ -41,6 +41,7 @@ def createEvent(request):
 	if request.is_ajax() and request.method == 'POST':
 		obj = request.POST
 		try:
+		  # TODO: Is there a way to loop through Event object attributes instead?
 			title = obj['title']
 			location = obj.get('location','')
 			allday = obj['allday']
