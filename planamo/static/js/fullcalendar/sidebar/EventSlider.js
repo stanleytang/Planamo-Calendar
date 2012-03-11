@@ -113,8 +113,9 @@ function EventSlider(calendar, options) {
 					$('.event-editable').blur();
 					if (calendar.isNewEventBeingCreated()) {
 						$('#add-event-button').click();
+					} else {
+						$("#done-event-button").click();
 					}
-					$("#done-event-button").click();
 				}
 				
 				//TODO: delete key
@@ -287,7 +288,6 @@ function EventSlider(calendar, options) {
 		var doneEventButton = $("<div id='done-event-button'>done</div>");
 		var deleteEventButton = $("<div id='delete-event-button'>delete</div>");
 		
-		
 		//button callbacks
 		addEventButton.click(function () { 		
 			$.ajax({
@@ -307,7 +307,7 @@ function EventSlider(calendar, options) {
 						currentEvent.id = data.eventID;
 						calendar.unselect();
 				    completeEventCreation();
-				    textbox.resetTextbox();
+				    textbox.resetTextbox(); 
 				    calendar.renderEvent(currentEvent, true);
 					} else {
 						alert("Error adding event"); //temp solution TODO create a notification box
@@ -324,7 +324,6 @@ function EventSlider(calendar, options) {
 		  }, true); // don't need user confirmation again for cancel event
 		  textbox.resetTextbox();
 		});
-		
 		doneEventButton.click(function () { 
 			close();
 		});
