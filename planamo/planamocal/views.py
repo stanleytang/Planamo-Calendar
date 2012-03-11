@@ -17,9 +17,21 @@ def index(request):
 def jsonfeed(request):
   events = Event.objects.filter(attendance__user__id=1)
   data = [event.json() for event in events]
-  return HttpResponse(simplejson.dumps(data),
-   mimetype='application/json')
-  
+  return HttpResponse(simplejson.dumps(data), mimetype='application/json')
+
+
+def get_boolean(value):
+  """
+  HELPER FUNCTION
+  Converts a String into a Boolean value
+  """
+  if value == 'False' or value == 'false':
+    value = False
+  elif value:
+    value = True
+  else:
+    value = False
+  return value
 
 # temp solution
 from django.views.decorators.csrf import csrf_exempt
@@ -32,15 +44,11 @@ def createEvent(request):
 			title = obj['title']
 			location = obj.get('location','')
 			allday = obj['allday']
-			if allday == 'false' or allday == '0' or allday == 0 or allday == 'False':
-				allday = False
-			else:
-				allday = True
+			allday = get_boolean(allday)
 			start_date = datetime.strptime(obj['start_date'], 
 				"%a, %d %b %Y %H:%M:%S %Z")
 			end_date = datetime.strptime(obj['end_date'], 
-				"%a, %d %b %Y %H:%M:%S %Z")
-					
+				"%a, %d %b %Y %H:%M:%S %Z")					
 			newEvent = Event(title=title, location=location, allday=allday, 
 				start_date=start_date, end_date=end_date)
 			newEvent.save()
