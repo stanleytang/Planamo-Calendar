@@ -20,14 +20,18 @@ def jsonfeed(request):
   return HttpResponse(simplejson.dumps(data), mimetype='application/json')
 
 
-def get_boolean(value):	
-	if value == 'False' or value == 'false':
-		value = False
-	elif value:
-		value = True
-	else:
-		value = False
-	return value
+def get_boolean(value):
+  """
+  HELPER FUNCTION
+  Converts a String into a Boolean value
+  """
+  if value == 'False' or value == 'false':
+    value = False
+  elif value:
+    value = True
+  else:
+    value = False
+  return value
 
 # temp solution
 from django.views.decorators.csrf import csrf_exempt
