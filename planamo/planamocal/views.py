@@ -1,7 +1,7 @@
 # Create your views here.
 from django.shortcuts import render_to_response, get_object_or_404
 from planamocal.models import Calendar, Event, Attendance
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.template import RequestContext
 from django.utils import simplejson
 from datetime import datetime
@@ -40,15 +40,16 @@ def createEvent(request):
 			newEvent = Event(title=title, location=location, allday=allday, 
 				start_date=start_date, end_date=end_date)
 			newEvent.save()
-			try:
-			  calendar = get_object_or_404(Calendar, id=1)
-			  attendance = Attendance(user=calendar, event=newEvent)
-			  attendance.save()
-			except:
-			  print "Calendar doesn't exist"
-			message = {'success': True, 'eventID': newEvent.id}
 			
+			calendar = get_object_or_404(Calendar, id=1)
+			attendance = Attendance(user=calendar, event=newEvent)
+			attendance.save()
+			message = {'success': True, 'eventID': newEvent.id}
 		except KeyError:
+			print "Error reading event values from json object"
+			message = {'success': False}
+		except Http404:
+			print "Calendar doesn't exist"
 			message = {'success': False}
 	else:
 		message = {'success': False}
