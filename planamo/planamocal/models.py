@@ -9,6 +9,6 @@ class Calendar(models.Model):
 			return "Calendar"
 			
 class Event(models.Model):
-	calendar = models.ForeignKey(Calendar)
+	#calendar = models.ForeignKey(Calendar)
 	name = models.CharField(max_length=100)
 	location = models.CharField(max_length=100)

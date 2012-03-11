@@ -1,24 +1,29 @@
 # Create your views here.
 from django.shortcuts import render_to_response, get_object_or_404
-from planamocal.models import Calendar
-from django.http import HttpResponse, HttpResponseRedirect
+from planamocal.models import Calendar, Event
+from django.http import HttpResponse
+from django.template import RequestContext
+from django.utils import simplejson
 
 def index(request):
 	calendar = get_object_or_404(Calendar, pk=1)
 	return render_to_response(
-		'planamocal/index.html',
+		'planamocal/calendar.html',
 		{'calendar': calendar},
+		context_instance = RequestContext(request)
 	)
 	
-from django.views.decorators.csrf import csrf_exempt #temp solution
-@csrf_exempt #temp solution
+# temp solution
+from django.views.decorators.csrf import csrf_exempt
+@csrf_exempt
+# end temp solution
 def createEvent(request):
 	if request.is_ajax():
-		if request.method == 'GET':
-			message = "This is an XHR GET request"
-	  	elif request.method == 'POST':
-	  		message = "This is an XHR POST request"
-	    	# Here we can access the POST data
+		if request.method == 'POST':
+			obj = request.POST
+			newEvent = Event(name=obj['title'],)
+			newEvent.save()
+			message = {'success': True, 'event': newEvent}
 	else:
-		message = "No XHR"
-	return HttpResponse(message)
+		message = {'success': False}
+	return HttpResponse(simplejson.dumps(message), mimetype='application/json')

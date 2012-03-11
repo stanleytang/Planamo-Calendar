@@ -290,13 +290,26 @@ function EventSlider(calendar, options) {
 		
 		//button callbacks
 		addEventButton.click(function () { 		
-			$.post("/cal/createEvent/", { 
-			    user: "hello"
-			},
-			    function(data) {
-			        alert(data);
-			    }
-			);
+			$.ajax({
+				type: 'POST',
+				url: '/cal/createEvent/',
+				data: {
+					'title': currentEvent.title,
+					'location': currentEvent.location,
+					'allDay': currentEvent.allDay,
+				//	'start': currentEvent.start,
+				//	'end': currentEvent.end,
+					'notes': currentEvent.notes,
+					'color': currentEvent.color
+				},
+				success: function(data) {
+					debugger;
+					if (data.success) {
+						alert(data.event.name);
+					}
+				},
+				dataType: 'json'
+			});
 			
 			
 			calendar.unselect();

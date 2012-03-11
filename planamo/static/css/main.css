@@ -73,7 +73,7 @@ body {
 
 #sidebar-top {
 	min-height: 50px;
-	background: url('/mymedia/images/sidebar-top-bg.jpg');
+	background: url('../images/sidebar-top-bg.jpg');
 }
 
 #sidebar-main {
@@ -88,7 +88,7 @@ body {
 }
 
 #calendar-shadow {
-	background: transparent url('/mymedia/images/sidebar-bg-shadow.png') repeat-y; 
+	background: transparent url('../images/sidebar-bg-shadow.png') repeat-y; 
 	width: 15px;
 	height: 100%;
 	float: left;
@@ -159,7 +159,7 @@ textarea#add-event-textbox {
 }
 
 #sticky-notes .note .sticky-note-title.collapse{
-	background: #fcf6a3 url('/mymedia/images/stickynotes-collapse.png') no-repeat top right;
+	background: #fcf6a3 url('../images/stickynotes-collapse.png') no-repeat top right;
 }
 
 #sticky-notes textarea {
@@ -282,7 +282,7 @@ textarea#add-event-textbox {
 	}
 	
 	#event-content .event-color-selected {
-		background: url('/mymedia/images/tick.png');
+		background: url('../images/tick.png');
 	}
 	
 	/* Event input boxes */
