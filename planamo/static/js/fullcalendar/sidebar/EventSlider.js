@@ -287,8 +287,18 @@ function EventSlider(calendar, options) {
 		var doneEventButton = $("<div id='done-event-button'>done</div>");
 		var deleteEventButton = $("<div id='delete-event-button'>delete</div>");
 		
+		
 		//button callbacks
-		addEventButton.click(function () { 
+		addEventButton.click(function () { 		
+			$.post("/cal/createEvent/", { 
+			    user: "hello"
+			},
+			    function(data) {
+			        alert(data);
+			    }
+			);
+			
+			
 			calendar.unselect();
       completeEventCreation();
       textbox.resetTextbox();

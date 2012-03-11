@@ -198,6 +198,18 @@ function resizeSideBar() {
 
 <body>
 	
+	{% block messages %}
+	{% if messages %}
+		<div style="position:fixed">
+		<ul>
+	  	{% for message in messages %}
+	     	<li><span>{{ message }}</span></li>
+	    {% endfor %}
+		</ul>
+		</div>
+	{% endif %}
+	{% endblock %}
+	
 	<div id="container">
 		
 		<div id="header">
