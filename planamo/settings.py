@@ -4,7 +4,7 @@ DEBUG = True #set to false if want to see 404
 TEMPLATE_DEBUG = DEBUG
 
 import os.path
-PROJECT_DIR = os.path.dirname(__file__) #Personal hack - directory to project file
+PROJECT_DIR = os.path.dirname(__file__) # directory to project file hack
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -106,7 +106,8 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'planamo.urls'
 
 TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
+    # Put strings here, like "/home/html/django_templates" or
+    # "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
 		os.path.join(PROJECT_DIR, 'templates')

@@ -15,7 +15,6 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
-		url(r'^polls/', include('polls.urls')),
 		url(r'^cal/', include('planamocal.urls')),
 		url(r'^mymedia/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
 )
