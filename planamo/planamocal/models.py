@@ -50,6 +50,7 @@ class Event(models.Model):
 	
 	def json(self):
 	  return {
+			'id': self.id,
 	    'title': self.title,
 	    'location': self.location,
 	    'allDay': self.allday,

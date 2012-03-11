@@ -13,7 +13,6 @@ function EventSlider(calendar, options) {
 	var isTransitioning = false;
   var slider = $('#event-slider-container');
   var textbox; // EventTextbox to keep communicate with
-
   
   //exports
 	t.render = render;
@@ -33,6 +32,9 @@ function EventSlider(calendar, options) {
 	/* gcal colors: red, blue, green, purple, pink, yellow, orange, aqua, grey */
 	//var eventColorOptions = ['#d06b64', '#a4bdfc', '#7ae7bf', '#dbadff', 
 		//'#ff887c', '#fbd75b', '#ffb878', '#46d6db', '#e1e1e1'];
+		
+	/* notification box - milliseconds to display before fading away */
+	var notificationBoxDelay = 3000;
 	
 	/**
 	 * Function: setEventTextbox
@@ -304,15 +306,15 @@ function EventSlider(calendar, options) {
 				},
 				success: function(data) {
 					if (data.success) {
-						currentEvent.id = data.eventID;
+						currentEvent._id = currentEvent.id = data.eventID;
 						calendar.unselect();
 				    completeEventCreation();
 				    textbox.resetTextbox(); 
 				    calendar.renderEvent(currentEvent, true);
-						$("#notification-box-container").show().delay(2000).fadeOut();
+						$("#notification-box-container").show().delay(notificationBoxDelay).fadeOut();
 						$("#notification-content").html("Successfuly added event to calendar");
 					} else {
-						$("#notification-box-container").show().delay(2000).fadeOut();
+						$("#notification-box-container").show().delay(notificationBoxDelay).fadeOut();
 						$("#notification-content").html("Error saving event");
 					}
 				},
@@ -332,8 +334,25 @@ function EventSlider(calendar, options) {
 		});
 		deleteEventButton.click(function () { 
 			if (confirm('Are you sure you want to delete this event?')) {
-				calendar.removeEvents(currentEvent.id);
-				close();
+				$.ajax({
+					type: 'POST',
+					url: '/cal/deleteEvent/',
+					data: {
+						'eventID': currentEvent.id
+					},
+					success: function(data) {
+						if (data.success) {
+							calendar.removeEvents(currentEvent.id);
+							close();
+							$("#notification-box-container").show().delay(notificationBoxDelay).fadeOut();
+							$("#notification-content").html("Successfuly deleted event from calendar");
+						} else {
+							$("#notification-box-container").show().delay(notificationBoxDelay).fadeOut();
+							$("#notification-content").html("Error deleting event from calendar");
+						}
+					},
+					dataType: 'json'
+				});
 			} else {
 				return false;
 			}

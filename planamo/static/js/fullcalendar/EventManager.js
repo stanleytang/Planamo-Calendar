@@ -254,7 +254,7 @@ function EventManager(options, _sources) {
 	
 	
 	function renderEvent(event, stick) {
-		var out = normalizeEvent(event); // return normalized event
+	//	var out = normalizeEvent(event); // return normalized event
 		if (!event.source) {
 			if (stick) {
 				stickySource.events.push(event);
@@ -264,7 +264,7 @@ function EventManager(options, _sources) {
 		}
 		reportEvents(cache);
 		
-		return out;
+		return event;
 	}
 	
 	
