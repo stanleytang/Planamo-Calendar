@@ -296,14 +296,13 @@ function EventSlider(calendar, options) {
 				data: {
 					'title': currentEvent.title,
 					'location': currentEvent.location,
-					'allday': currentEvent.allDay,
+					'allday': currentEvent.allDay ? true : false,
 					'start_date': currentEvent.start.toUTCString(),
 					'end_date': currentEvent.end.toUTCString(),
 					'notes': currentEvent.notes,
 					'color': currentEvent.color
 				},
 				success: function(data) {
-					debugger;
 					if (data.success) {
 						currentEvent.id = data.eventID;
 						calendar.unselect();
@@ -311,7 +310,7 @@ function EventSlider(calendar, options) {
 				    textbox.resetTextbox();
 				    calendar.renderEvent(currentEvent, true);
 					} else {
-						alert("Error adding event"); //temp solution TODO create a notificaiton box
+						alert("Error adding event"); //temp solution TODO create a notification box
 					}
 				},
 				dataType: 'json'
