@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.query import QuerySet
+from django.utils import simplejson
 
 def today():
   """
@@ -46,6 +47,15 @@ class Event(models.Model):
 	end_date = models.DateTimeField()
 	
 	objects = EventManager()
+	
+	def json(self):
+	  return {
+	    'title': self.title,
+	    'location': self.location,
+	    'allDay': self.allday,
+	    'start': self.start_date.isoformat(),
+	    'end': self.end_date.isoformat(),
+	  }
 	
 	def __unicode__(self):
 	  return self.title

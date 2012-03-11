@@ -112,57 +112,7 @@ function resizeSideBar() {
 			eventDrop: function(event) {
 			  slider.update(event);
 			},
-			events: url: "/jsonfeed"
-			/*[
-				{
-				  id: 122220,
-					title: 'All Day Event',
-					start: new Date(y, m, 1),
-					end: new Date(y, m, 1)
-				},
-				{
-				  id: 123432,
-					title: 'Long Event',
-					start: new Date(y, m, d-5),
-					end: new Date(y, m, d-2)
-				},
-				{
-					id: 999,
-					title: 'Repeating Event',
-					start: new Date(y, m, d-3, 16, 0),
-					end: new Date(y, m, d-3, 17, 0),
-					allDay: false
-				},
-				{
-					id: 999,
-					title: 'Repeating Event',
-					start: new Date(y, m, d+4, 16, 0),
-					end: new Date(y, m, d+4, 17, 0),
-					allDay: false
-				},
-				{
-				  id: 12,
-					title: 'Meeting',
-					start: new Date(y, m, d, 09, 30),
-					end: new Date(y, m, d, 11, 0),
-					allDay: false
-				},
-				{
-				  id: 123,
-					title: 'Lunch',
-					start: new Date(y, m, d, 12, 0),
-					end: new Date(y, m, d, 14, 0),
-					allDay: false
-				},
-				{
-				  id: 32,
-					title: 'Birthday Party',
-					start: new Date(y, m, d+1, 19, 0),
-					end: new Date(y, m, d+1, 22, 30),
-					allDay: false
-				}
-			]*/
-
+			events: '/cal/jsonfeed/'
 		});
 
 		var slider = calendar.fullCalendar('slider');

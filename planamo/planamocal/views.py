@@ -12,7 +12,14 @@ def index(request):
 		{'calendar': calendar},
 		context_instance = RequestContext(request)
 	)
-	
+
+def jsonfeed(request):
+  events = Event.objects.filter(attendance__user__id=1)
+  data = [event.json() for event in events]
+  return HttpResponse(simplejson.dumps(data),
+   mimetype='application/json')
+  
+
 # temp solution
 from django.views.decorators.csrf import csrf_exempt
 @csrf_exempt
