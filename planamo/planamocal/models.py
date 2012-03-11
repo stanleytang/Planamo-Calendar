@@ -40,8 +40,8 @@ class EventManager(models.Manager):
 		
 class Event(models.Model):
 	title = models.CharField(max_length=100)
-	location = models.CharField(max_length=100)
-	allday = models.BooleanField(default=False)
+	location = models.CharField(max_length=100, blank=True)
+	allday = models.BooleanField(default=True)
 	start_date = models.DateTimeField()
 	end_date = models.DateTimeField()
 	

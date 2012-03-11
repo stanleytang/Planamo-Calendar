@@ -296,26 +296,26 @@ function EventSlider(calendar, options) {
 				data: {
 					'title': currentEvent.title,
 					'location': currentEvent.location,
-					'allDay': currentEvent.allDay,
-				//	'start': currentEvent.start,
-				//	'end': currentEvent.end,
+					'allday': currentEvent.allDay,
+					'start_date': currentEvent.start.toUTCString(),
+					'end_date': currentEvent.end.toUTCString(),
 					'notes': currentEvent.notes,
 					'color': currentEvent.color
 				},
 				success: function(data) {
 					debugger;
 					if (data.success) {
-						alert(data.event.name);
+						currentEvent.id = data.eventID;
+						calendar.unselect();
+				    completeEventCreation();
+				    textbox.resetTextbox();
+				    calendar.renderEvent(currentEvent, true);
+					} else {
+						alert("Error adding event"); //temp solution TODO create a notificaiton box
 					}
 				},
 				dataType: 'json'
 			});
-			
-			
-			calendar.unselect();
-      completeEventCreation();
-      textbox.resetTextbox();
-      calendar.renderEvent(currentEvent, true);
 		});
 		cancelEventButton.click(function () {
 		  close(function () {
