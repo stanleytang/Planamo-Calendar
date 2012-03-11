@@ -59,6 +59,7 @@ def createEvent(request):
 		message = {'success': False}
 	return HttpResponse(simplejson.dumps(message), mimetype='application/json')
 
+'''
 @csrf_exempt # temp solution
 def deleteEvent(request):
 	if request.is_ajax() and request.method == 'POST':
@@ -66,3 +67,4 @@ def deleteEvent(request):
 	else:
 		message = {'success': False}
 	return HttpResponse(simplejson.dumps(message), mimetype='application/json')
+'''
