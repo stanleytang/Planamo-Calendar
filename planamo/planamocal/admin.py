@@ -1,4 +1,4 @@
-from planamocal.models import Calendar, Event
+from planamocal.models import Calendar, Event, Attendance
 from django.contrib import admin
 
 # class ChoiceInline(admin.StackedInline):
@@ -14,3 +14,4 @@ from django.contrib import admin
 
 admin.site.register(Calendar)
 admin.site.register(Event)
+admin.site.register(Attendance)
