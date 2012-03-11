@@ -40,6 +40,8 @@ from django.views.decorators.csrf import csrf_exempt
 def createEvent(request):
 	if request.is_ajax() and request.method == 'POST':
 		obj = request.POST
+		
+		# Read in event object
 		try:
 			title = obj['title']
 			location = obj.get('location','')
@@ -49,17 +51,22 @@ def createEvent(request):
 				"%a, %d %b %Y %H:%M:%S %Z")
 			end_date = datetime.strptime(obj['end_date'], 
 				"%a, %d %b %Y %H:%M:%S %Z")					
-			newEvent = Event(title=title, location=location, allday=allday, 
-				start_date=start_date, end_date=end_date)
-			newEvent.save()
+		except KeyError:
+			message = {'success': False}
+			print "Error reading values from event json"
+			return HttpResponse(simplejson.dumps(message), mimetype='application/json')
 			
+		# Save event
+		newEvent = Event(title=title, location=location, allday=allday, 
+			start_date=start_date, end_date=end_date)
+		newEvent.save()
+		
+		# Create attendance (map event to calendar)
+		try:	
 			calendar = get_object_or_404(Calendar, id=1)
 			attendance = Attendance(user=calendar, event=newEvent)
 			attendance.save()
 			message = {'success': True, 'eventID': newEvent.id}
-		except KeyError:
-			print "Error reading event values from json object"
-			message = {'success': False}
 		except Http404:
 			print "Calendar doesn't exist"
 			message = {'success': False}
