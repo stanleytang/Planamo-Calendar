@@ -303,7 +303,6 @@ function EventSlider(calendar, options) {
 					'color': currentEvent.color
 				},
 				success: function(data) {
-					debugger;
 					if (data.success) {
 						currentEvent.id = data.eventID;
 						calendar.unselect();
