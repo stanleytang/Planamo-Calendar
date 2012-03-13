@@ -2,27 +2,8 @@ from datetime import datetime, timedelta
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.query import QuerySet
-from django.utils import simplejson
-
-
-from django.contrib.auth.models import User
 from django.db.models.signals import post_save
-
-class UserProfile(models.Model):  
-    user = models.OneToOneField(User)  
-    #other fields here
-    calendar = models.OneToOneField(Calendar, null=True)
-    
-
-    def __str__(self):  
-          return "%s's profile" % self.user  
-
-def create_user_profile(sender, instance, created, **kwargs):  
-    if created:  
-       profile, created = UserProfile.objects.get_or_create(user=instance)  
-
-post_save.connect(create_user_profile, sender=User)
-
+from django.utils import simplejson
 
 def today():
     """
@@ -92,7 +73,7 @@ class Calendar(models.Model):
 	events = models.ManyToManyField(Event, through='Attendance')
 	# view = models.CharField(max_length=1, choices=VIEW_CHOICES, default='W')
 	def __unicode__(self):
-	    return "Calendar"
+		return self.name
 
 class Attendance(models.Model):
     COLOR_CHOICES = (
@@ -103,9 +84,29 @@ class Attendance(models.Model):
         ('VI', 'Violet'),
         ('IN', 'Indigo'),
     )
-    user = models.ForeignKey(Calendar)
+    calendar = models.ForeignKey(Calendar)
     event = models.ForeignKey(Event)
     # color = models.CharField(max_length=2, choices=COLOR_CHOICES)
-    
+  
     class Meta(object):
         verbose_name_plural = "Attendance"
+        
+class UserProfile(models.Model):
+    """
+    Extension class for the User model
+    """
+    user = models.OneToOneField(User)
+    calendar = models.OneToOneField(Calendar, null=True)
+
+def create_user_profile(sender, instance, created, **kwargs):
+    print sender
+    print instance
+    print kwargs
+    if created:
+        try:
+            profile, created = UserProfile.objects.get_or_create(user=instance)
+        except:
+            print 'U lose'
+        print UserProfile.objects.all()
+    
+post_save.connect(create_user_profile, sender=User)
