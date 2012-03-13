@@ -120,7 +120,16 @@ function EventSlider(calendar, options) {
 					}
 				}
 				
-				//TODO: delete key
+				/*
+				//Delete - delete
+				if (e.keyCode == 46) { 
+					$('.event-editable').blur();
+					if (calendar.isNewEventBeingCreated()) {
+						$('#cancel-event-button').click();
+					} else {
+						$("#delete-event-button").click();
+					}
+				} */
 			}
 		});
 	}

@@ -27,17 +27,17 @@ def jsonfeed(request):
 
 
 def get_boolean(value):
-  """
-  HELPER FUNCTION
-  Converts a String into a Boolean value
-  """
-  if value == 'False' or value == 'false':
-    value = False
-  elif value:
-    value = True
-  else:
-    value = False
-  return value
+    """
+    HELPER FUNCTION
+    Converts a String into a Boolean value
+    """
+    if value == 'False' or value == 'false':
+        value = False
+    elif value:
+        value = True
+    else:
+        value = False
+    return value
 
 # temp solution
 from django.views.decorators.csrf import csrf_exempt
