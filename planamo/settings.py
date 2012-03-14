@@ -122,11 +122,18 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
 	'planamocal',
+	'accounts',
+	'registration',
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )
+
+ACCOUNT_ACTIVATION_DAYS = 2
+LOGIN_REDIRECT_URL = '/'
+EMAIL_HOST = 'localhost'
+DEFAULT_FROM_EMAIL = 'webmaster@localhost'
 
 AUTH_PROFILE_MODULE = 'planamocal.UserProfile'
 

@@ -1,5 +1,6 @@
 from django.conf.urls.defaults import *
 from planamo import settings
+from django.views.generic.simple import direct_to_template
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -15,11 +16,14 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
-		url(r'^cal/', include('planamocal.urls')),
+    url(r'^cal/', include('planamocal.urls')),
+    url(r'^accounts/', include('registration.urls')),
+    url(r'^$', direct_to_template,
+        { 'template': 'index.html' }, 'index'),
 		
-		# serving static files - only to be used during development
-		# TODO - django does not recommend serving static files off django,
-		# instead, use some other web server
-		(r'^mymedia/(?P<path>.*)$', 'django.views.static.serve', 
-			{'document_root': settings.STATIC_ROOT, 'show_indexes': True}),
+    # serving static files - only to be used during development
+    # TODO - django does not recommend serving static files off django,
+    # instead, use some other web server
+    (r'^mymedia/(?P<path>.*)$', 'django.views.static.serve', 
+        {'document_root': settings.STATIC_ROOT, 'show_indexes': True}),
 )
