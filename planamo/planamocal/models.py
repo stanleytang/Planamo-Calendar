@@ -6,39 +6,39 @@ from django.db.models.signals import post_save
 from django.utils import simplejson
 
 def today():
-  """
-  Returns a tuple of two datetime instances: the beginning of today, and the 
-  end of today.
-  """
-  now = datetime.now()
-  start = datetime.min.replace(year=now.year, month=now.month, day=now.day)
-  end = (start + timedelta(days=1)) - timedelta.resolution
-  return (start, end)
+    """
+    Returns a tuple of two datetime instances: the beginning of today, and the 
+    end of today.
+    """
+    now = datetime.now()
+    start = datetime.min.replace(year=now.year, month=now.month, day=now.day)
+    end = (start + timedelta(days=1)) - timedelta.resolution
+    return (start, end)
 
 class EventQuerySet(QuerySet):
-  """
-  A very simple ``QuerySet`` subclass which adds only one extra method,
-  ``today``, which returns only those objects whose ``creation_date`` falls
-  within the bounds of today.
-  """
-  def today(self):
     """
-    Filters down to only those objects whose ``creation_date`` falls within
-    the bounds of today.
+    A very simple ``QuerySet`` subclass which adds only one extra method,
+    ``today``, which returns only those objects whose ``creation_date`` falls
+    within the bounds of today.
     """
-    return self.filter(creation_date__range=today())
+    def today(self):
+        """
+        Filters down to only those objects whose ``creation_date`` falls within
+        the bounds of today.
+        """
+        return self.filter(creation_date__range=today())
 
 class EventManager(models.Manager):
-  """
-  A very simple ``Manager`` subclass which returns an ``EventQuerySet``
-  instead of the typical ``QuerySet``.  It also includes a proxy for the extra
-  ``today`` method that is provided by the ``EventQuerySet`` subclass.
-  """
-  def get_query_set(self):
-    return EventQuerySet(self.model)
+    """
+    A very simple ``Manager`` subclass which returns an ``EventQuerySet``
+    instead of the typical ``QuerySet``.  It also includes a proxy for the extra
+    ``today`` method that is provided by the ``EventQuerySet`` subclass.
+    """
+    def get_query_set(self):
+        return EventQuerySet(self.model)
 
-  def today(self):
-    return self.get_query_set().today()
+    def today(self):
+        return self.get_query_set().today()
 		
 class Event(models.Model):
 	title = models.CharField(max_length=100)
@@ -50,18 +50,18 @@ class Event(models.Model):
 	objects = EventManager()
 	
 	def json(self):
-	  return {
-		'id': self.id,
-	    'title': self.title,
-	    'location': self.location,
-	    'allDay': self.allday,
-	    'start': self.start_date.isoformat(),
-	    'end': self.end_date.isoformat(),
-	  }
+        return {
+		    'id': self.id,
+	        'title': self.title,
+	        'location': self.location,
+	        'allDay': self.allday,
+	        'start': self.start_date.isoformat(),
+	        'end': self.end_date.isoformat(),
+        }
 	
 	def __unicode__(self):
-	  return self.title
-  
+	    return self.title
+	    
 class Calendar(models.Model):
 	owner = models.ForeignKey(User)
 	VIEW_CHOICES = (
