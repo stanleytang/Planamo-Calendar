@@ -1,7 +1,5 @@
-from planamocal.models import Calendar, Event, Attendance, UserProfile
+from planamocal.models import Calendar, Event, Attendance
 from django.contrib import admin
-from django.contrib.auth.models import User
-from django.contrib.auth.admin import UserAdmin
 
 # class ChoiceInline(admin.StackedInline):
 #     model = Choice
