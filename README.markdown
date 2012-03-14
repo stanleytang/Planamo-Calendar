@@ -22,7 +22,8 @@
         sudo pip install django-registration
         
         
-**II. Local database installation **
+        
+**II. Local database installation**
 
 1. Install PostgreSQL (http://www.postgresql.org/download/) with superuser "postgres" and password "andyfang"
 2. To create a local database compatible with the settings.py, be sure to create a database with the name "planamodb"
