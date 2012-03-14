@@ -39,41 +39,41 @@ class EventManager(models.Manager):
 
     def today(self):
         return self.get_query_set().today()
-		
+
 class Event(models.Model):
-	title = models.CharField(max_length=100)
-	location = models.CharField(max_length=100, blank=True)
-	allday = models.BooleanField(default=True)
-	start_date = models.DateTimeField()
-	end_date = models.DateTimeField()
-	
-	objects = EventManager()
-	
-	def json(self):
+    title = models.CharField(max_length=100)
+    location = models.CharField(max_length=100, blank=True)
+    allday = models.BooleanField(default=True)
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+    
+    objects = EventManager()
+    
+    def json(self):
         return {
-		    'id': self.id,
-	        'title': self.title,
-	        'location': self.location,
-	        'allDay': self.allday,
-	        'start': self.start_date.isoformat(),
-	        'end': self.end_date.isoformat(),
+            'id': self.id,
+            'title': self.title,
+            'location': self.location,
+            'allDay': self.allday,
+            'start': self.start_date.isoformat(),
+            'end': self.end_date.isoformat(),
         }
-	
-	def __unicode__(self):
-	    return self.title
-	    
+    
+    def __unicode__(self):
+        return self.title
+        
 class Calendar(models.Model):
-	owner = models.ForeignKey(User)
-	VIEW_CHOICES = (
-	    ('M', 'Month'),
-	    ('W', 'Week'),
-	    ('D', 'Day')
-	)
-	name = models.CharField(max_length=100)
-	events = models.ManyToManyField(Event, through='Attendance')
-	# view = models.CharField(max_length=1, choices=VIEW_CHOICES, default='W')
-	def __unicode__(self):
-		return "%s's calendar" % self.owner.username
+    owner = models.OneToOneField(User)
+    VIEW_CHOICES = (
+        ('M', 'Month'),
+        ('W', 'Week'),
+        ('D', 'Day')
+    )
+    name = models.CharField(max_length=100)
+    events = models.ManyToManyField(Event, through='Attendance')
+    # view = models.CharField(max_length=1, choices=VIEW_CHOICES, default='W')
+    def __unicode__(self):
+        return "%s's calendar" % self.owner.username
 
 class Attendance(models.Model):
     COLOR_CHOICES = (
