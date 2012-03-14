@@ -51,7 +51,7 @@ class Event(models.Model):
 	
 	def json(self):
 	  return {
-			'id': self.id,
+		'id': self.id,
 	    'title': self.title,
 	    'location': self.location,
 	    'allDay': self.allday,
@@ -63,7 +63,7 @@ class Event(models.Model):
 	  return self.title
   
 class Calendar(models.Model):
-	# owner = models.ForeignKey(User)
+	owner = models.ForeignKey(User)
 	VIEW_CHOICES = (
 	    ('M', 'Month'),
 	    ('W', 'Week'),
@@ -73,7 +73,7 @@ class Calendar(models.Model):
 	events = models.ManyToManyField(Event, through='Attendance')
 	# view = models.CharField(max_length=1, choices=VIEW_CHOICES, default='W')
 	def __unicode__(self):
-		return self.name
+		return "%s's calendar" % self.owner.username
 
 class Attendance(models.Model):
     COLOR_CHOICES = (
@@ -90,24 +90,3 @@ class Attendance(models.Model):
   
     class Meta(object):
         verbose_name_plural = "Attendance"
-        
-class UserProfile(models.Model):
-    """
-    Extension class for the User model
-    """
-    user = models.OneToOneField(User)
-    
-    calendar = models.OneToOneField(Calendar, null=True)
-
-def create_user_profile(sender, instance, created, **kwargs):
-    print sender
-    print instance
-    print kwargs
-    if created:
-        try:
-            profile, created = UserProfile.objects.get_or_create(user=instance)
-        except:
-            print 'U lose'
-        print UserProfile.objects.all()
-    
-post_save.connect(create_user_profile, sender=User)
