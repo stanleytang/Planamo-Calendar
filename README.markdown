@@ -1,26 +1,23 @@
-**Ia. Installing packages using virtualenv**
+**I. Using virtualenv**
 
 1. If you haven't already, install virtualenv
 
-        sudo pip install virtualenv
+        pip install virtualenv
 2. Within the outmost directory, create a virtualenv
 
         virtualenv venv --distribute
 3. For each terminal session, you need to run
 
         source venv/bin/activate
+4. Once the virtual environment is set up, 
 
 
-**Ib. Installing packages without virtualenv**
+**II. Installing packages with pip**
 
-1. Install Django version 1.3.1 (https://www.djangoproject.com/download/)
-2. Install pytz, a Python timezone-managing package:
-
-        sudo pip install pytz
-3. Install django-registration
-
-        sudo pip install django-registration
-        
+1. Install pip if you haven't yet
+2. (One of the modules requires you to have Mercurial on your computer)
+3. Install the required python modules specified in "requirements.txt"
+        pip install -r requirements.txt
         
         
 **II. Local database installation**
