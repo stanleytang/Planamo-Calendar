@@ -77,16 +77,16 @@ class Calendar(models.Model):
 
 class Attendance(models.Model):
     COLOR_CHOICES = (
-        ('OR', 'Orange'),
-        ('GR', 'Green'),
-        ('RE', 'Red'),
-        ('BL', 'Blue'),
-        ('VI', 'Violet'),
-        ('IN', 'Indigo'),
+        ('#ee7000', 'Orange'),
+        ('#00ad38', 'Green'),
+        ('#f62725', 'Red'),
+        ('#006ed5', 'Blue'),
+        ('#c744b5', 'Violet'),
+        ('#6144aa', 'Indigo'),
     )
     calendar = models.ForeignKey(Calendar)
     event = models.ForeignKey(Event)
-    # color = models.CharField(max_length=2, choices=COLOR_CHOICES)
+    color = models.CharField(max_length=7, choices=COLOR_CHOICES)
   
     class Meta(object):
         verbose_name_plural = "Attendance"

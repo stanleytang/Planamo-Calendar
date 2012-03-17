@@ -26,7 +26,13 @@ def jsonfeed(request):
     the user has tons of events? Maybe only return this months?
     """
     events = Event.objects.filter(attendance__calendar=request.user.calendar)
-    data = [event.json() for event in events]
+    data = []
+    for event in events:
+        attendance = get_object_or_404(Attendance,
+            calendar=request.user.calendar, event=event)
+        json_object = event.json()
+        json_object['color'] = attendance.color
+        data.append(json_object)
     return HttpResponse(simplejson.dumps(data), mimetype='application/json')
 
 def get_boolean(value):
@@ -69,8 +75,9 @@ def createEvent(request):
                 "%a, %d %b %Y %H:%M:%S %Z")
             end_date = datetime.strptime(obj['end_date'],
                 "%a, %d %b %Y %H:%M:%S %Z")
+            color = obj['color'].lower()
+                    
         except KeyError:
-            print 'hellooo'
             message = {'success': False}
             print "Error reading values from event json"
             return HttpResponse(simplejson.dumps(message),
@@ -89,7 +96,8 @@ def createEvent(request):
             message = {'success': False}
             return HttpResponse(simplejson.dumps(message), 
                 mimetype='application/json')
-        attendance = Attendance(calendar=calendar, event=newEvent)
+        attendance = Attendance(calendar=calendar, event=newEvent,
+            color=color)
         attendance.save()
         message = {'success': True, 'eventID': newEvent.id}
     else:
