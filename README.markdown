@@ -17,6 +17,7 @@
 1. Install pip if you haven't yet
 2. (One of the modules requires you to have Mercurial on your computer)
 3. Install the required python modules specified in "requirements.txt"
+
         pip install -r requirements.txt
         
         
