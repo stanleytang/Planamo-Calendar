@@ -3,4 +3,4 @@ distribute==0.6.24
 psycopg2==2.4.4
 wsgiref==0.1.2
 pytz==2012b
-django-registration==0.7
+hg+https://bitbucket.org/ubernostrum/django-registration

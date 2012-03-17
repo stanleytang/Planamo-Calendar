@@ -130,10 +130,12 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
 )
 
-ACCOUNT_ACTIVATION_DAYS = 2
-LOGIN_REDIRECT_URL = '/'
-EMAIL_HOST = 'localhost'
-DEFAULT_FROM_EMAIL = 'webmaster@localhost'
+# ACCOUNT_ACTIVATION_DAYS = 2
+# LOGIN_REDIRECT_URL = '/'
+# EMAIL_HOST = 'localhost'
+# DEFAULT_FROM_EMAIL = 'webmaster@localhost'
+REGISTRATION_OPEN = True
+
 
 AUTH_PROFILE_MODULE = 'planamocal.UserProfile'
 
