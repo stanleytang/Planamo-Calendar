@@ -48,10 +48,7 @@ def get_boolean(value):
         value = False
     return value
 
-# temp solution
-from django.views.decorators.csrf import csrf_exempt
-@csrf_exempt
-# end temp solution
+@login_required
 def createEvent(request):
     """
     Creates a new event mapped to calendar (through attendance). If success,
@@ -104,8 +101,7 @@ def createEvent(request):
         message = {'success': False}
     return HttpResponse(simplejson.dumps(message), mimetype='application/json')
 
-
-@csrf_exempt # temp solution
+@login_required
 def deleteEvent(request):
     """
     Delete attendance of user from event. If nobody is attending the event,
