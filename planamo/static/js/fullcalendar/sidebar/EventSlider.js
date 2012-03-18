@@ -13,6 +13,10 @@ function EventSlider(calendar, options) {
 	var isTransitioning = false;
   var slider = $('#event-slider-container');
   var textbox; // EventTextbox to keep communicate with
+  var updatedEvent = null;
+  var originalEvent = new Object(); // keeps a copy of the orignal state of currentEvent. 
+                            // So if a user decides to cancel, we can revert
+                            
   
   //exports
 	t.render = render;
@@ -209,7 +213,13 @@ function EventSlider(calendar, options) {
 			if (calendar.isNewEventBeingCreated()) {
 				$('#cancel-event-button').click();	
 			} else {
-				$("#done-event-button").click();
+			  if (changesMadeToEvent()) {
+			    var cancel = confirm("Your changes to the event isn't saved. Are you sure you to cancel?");
+			    if (cancel) close(null, false);
+			  } else {
+			    close(null, false);
+			  }
+			  //TODO - reset. new function??
 			}
 		});
 		eventHeader.append(closeSliderButton);
@@ -305,6 +315,7 @@ function EventSlider(calendar, options) {
               return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]); 
          }
     }
+  
 	
 	/**
 	 * Function: renderEventButtons
@@ -355,15 +366,55 @@ function EventSlider(calendar, options) {
 			});
 		});
 		cancelEventButton.click(function () {
-		  close(function () {
-        	calendar.isNewEventBeingCreated() &&
-          calendar.removeEvents(calendar.isNewEventBeingCreated().id);
-		    calendar.endEventCreation();
-		  }, true); // don't need user confirmation again for cancel event
-		  textbox.resetTextbox();
+		  if (calendar.isNewEventBeingCreated()) {
+        close(function () {
+            calendar.isNewEventBeingCreated() && 
+            calendar.removeEvents(calendar.isNewEventBeingCreated().id);
+          calendar.endEventCreation();
+          }, true); // don't need user confirmation again for cancel event
+        textbox.resetTextbox();
+      } else {
+        if (changesMadeToEvent()) {
+          currentEvent = originalEvent;
+          
+          //Hack - for some reason, date gets changed in original event.
+          //But the private variables date dont get changed
+          currentEvent.start = originalEvent._start;
+          currentEvent.end = originalEvent._end;
+          
+          calendar.updateEvent(currentEvent);
+        }
+        close(null, true);
+      }
 		});
 		doneEventButton.click(function () { 
-			close();
+		  if (changesMadeToEvent()) {
+		    $.ajax({
+    			type: 'POST',
+    			url: '/cal/updateEvent/',
+    			data: {
+    			  'eventID': currentEvent.id,
+    				'title': currentEvent.title,
+    				'location': currentEvent.location,
+    				'allday': currentEvent.allDay ? true : false,
+    				'start_date': currentEvent.start.toUTCString(),
+    				'end_date': currentEvent.end.toUTCString(),
+    				'notes': currentEvent.notes,
+    				'color': rgb2hex(currentEvent.color)
+    			},
+    			success: function(data) {
+    				if (data.success) {
+    					close(null, true);
+    					$("#notification-box-container").show().delay(notificationBoxDelay).fadeOut();
+    					$("#notification-content").html("Successfuly updated event to calendar");
+    				} else {
+    					$("#notification-box-container").show().delay(notificationBoxDelay).fadeOut();
+    					$("#notification-content").html("Error updating event");
+    				}
+    			},
+    			dataType: 'json'
+    		});
+		  }
 		});
 		deleteEventButton.click(function () { 
 			if (confirm('Are you sure you want to delete this event?')) {
@@ -392,8 +443,8 @@ function EventSlider(calendar, options) {
 		});
 		
 		//add to event buttons div
-		eventButtons.append(addEventButton, cancelEventButton, 
-			doneEventButton, deleteEventButton);
+		eventButtons.append(addEventButton, doneEventButton, 
+		  cancelEventButton, deleteEventButton);
 		
 		showCorrectButtons();
 		
@@ -414,7 +465,7 @@ function EventSlider(calendar, options) {
 			$("#delete-event-button").hide();
 		} else {
 			$("#add-event-button").hide();
-			$("#cancel-event-button").hide();
+			$("#cancel-event-button").show();
 			$("#done-event-button").show();
 			$("#delete-event-button").show();
 		}
@@ -672,6 +723,24 @@ function EventSlider(calendar, options) {
 	
 	
 	/*** VIEWING ***/
+	
+	/**
+   * Function: changesMadeToEvent
+   * ----------------------------
+   * Detects if changes have been made to the current event
+   *
+   * @return True, if changes made. Otherwise, false
+   */
+  function changesMadeToEvent() {
+    for (var name in currentEvent) {
+      if (currentEvent.hasOwnProperty(name)) {
+        if (name === "highlight" || name == "source") continue;
+        if (currentEvent[name] != originalEvent[name]) return true;
+      }
+    }
+    return false;
+  } 
+  
 	/**
 	 * Function: createAndViewEvent
 	 * ----------------------------
@@ -681,6 +750,16 @@ function EventSlider(calendar, options) {
 	 * @return none
 	 */
 	function createAndViewEvent(event) {
+	  if (changesMadeToEvent()) {
+      var cancel = confirm("Your changes to the event isn't saved yet. Are you sure you want to cancel?");
+      if (!cancel) {
+        currentEvent.highlight = true;
+        event.highlight = false;
+        calendar.unselect();
+        return this;
+      }
+    }
+	  
 	  var newEvent = calendar.createEvent(event);
     this.viewEvent(newEvent, true);
     calendar.renderEvent(newEvent, true);
@@ -700,11 +779,23 @@ function EventSlider(calendar, options) {
 	 * @return true if view is successful, false otherwise
 	 */
 	function viewEvent(event, forceCancel) {
-    if (currentEvent){
+	  if (currentEvent && event.id == currentEvent.id) return;
+	  
+    if (currentEvent){ 
       // if currentEvent to view 
       if (currentEvent.beingCreated) {
         if (!this.clear()) {
           return this; // exit immediately if user didn't want to cancel event
+        }
+      } else {
+        if (changesMadeToEvent()) {
+          var cancel = confirm("Your changes to the event isn'dt saved yet. Are you sure you want to cancel?");
+          if (!cancel) {
+            currentEvent.highlight = true;
+            event.highlight = false;
+            calendar.rerenderEvents(event.id, currentEvent.id);
+            return this;
+          }
         }
       }
       currentEvent = event;
@@ -713,11 +804,18 @@ function EventSlider(calendar, options) {
       currentEvent = event;
       this.triggerSlider(event, forceCancel);
     }
-		
+
+    originalEvent = $.extend({}, currentEvent);
+
 		//Resets size of event input boxes to fit content for new event
 		$("#event-title").data('AutoResizer').check(null, true);
 		$("#event-location").data('AutoResizer').check(null, true);
 		$("#event-notes").data('AutoResizer').check(null, true);
+		
+		//Highlight event
+    if (!calendar.isNewEventBeingCreated()) {
+      calendar.highlightEvent(event);
+    }
 			
 		return this;
 	}
@@ -737,7 +835,7 @@ function EventSlider(calendar, options) {
 	  if (forceCancel || calendar.isNewEventBeingCreated()) {
 	    var cancel;
 	    if (!forceCancel) {
-        cancel = confirm('Are you sure you want to cancel your event?');
+        cancel = confirm('Your event has not been saved. Are you sure you want to cancel?');
         if (!cancel) {
           return false; // exit immediately if user didn't mean to cancel
         }

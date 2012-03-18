@@ -141,9 +141,6 @@ function resizeSideBar() {
 			    return;
 			  // TODO deal with repeating event
 				slider.viewEvent(event);
-				if (!calendar.fullCalendar('isNewEventBeingCreated')) {
-					calendar.fullCalendar('highlightEvent', event);
-				}
 			},
 			eventResize: function(event) {
 			  slider.update(event);

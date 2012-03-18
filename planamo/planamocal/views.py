@@ -76,7 +76,7 @@ def createEvent(request):
                     
         except KeyError:
             message = {'success': False}
-            print "Error reading values from event json"
+            print "Error reading valsues from event json"
             return HttpResponse(simplejson.dumps(message),
                 mimetype='application/json')
 
@@ -149,7 +149,71 @@ def deleteEvent(request):
         attendance.delete()
         message = {'success': True}
         
-        # TODO - delete event if no more attendees - need to wait for model to be implemented
+        # If no more attendees, delete event
+        if event.attendance_set.all().count() == 0:
+            event.delete()
+    else:
+        message = {'success': False}
+    return HttpResponse(simplejson.dumps(message), mimetype='application/json')
+    
+@login_required
+def updateEvent(request):
+    """
+    Updates a current event and attendance dtails, given the JSON object from
+    request. If success, returns JSON object with success = true. Otherwise, 
+    return JSON object with success = false
+
+    @param POST + AJAX request from client
+    @return JSON object (success)
+    """
+    if request.is_ajax() and request.method == 'POST':
+        obj = request.POST
+
+        # Read in event object
+        try:
+            # TODO: Is there a way to loop through Event object attributes?
+            eventID = obj['eventID']
+            title = obj['title']
+            location = obj.get('location','')
+            allday = obj['allday']
+            allday = get_boolean(allday)
+            start_date = datetime.strptime(obj['start_date'], 
+                "%a, %d %b %Y %H:%M:%S %Z")
+            end_date = datetime.strptime(obj['end_date'],
+                "%a, %d %b %Y %H:%M:%S %Z")
+            color = obj['color'].lower()
+
+        except KeyError:
+            message = {'success': False}
+            print "Error reading valsues from event json"
+            return HttpResponse(simplejson.dumps(message),
+                mimetype='application/json')
+
+        # Get event
+        try:
+            event = Event.objects.filter(id=eventID).update(title=title, location=location, allday=allday,
+                start_date=start_date, end_date=end_date)
+        except ObjectDoesNotExist:
+            message = {'success': False}
+            print "Event doesn't exist in database"
+            return HttpResponse(simplejson.dumps(message), 
+                mimetype='application/json')
+        
+        # Update event
+        # TODO - make this more efficient (no need to update values not changed)
+       # event.update(title=title, location=location, allday=allday,
+        #    start_date=start_date, end_date=end_date)
+
+        # Update attendance
+        try:
+            calendar = request.user.calendar
+        except ObjectDoesNotExist:
+            print "Calendar doesn't exist"
+            message = {'success': False}
+            return HttpResponse(simplejson.dumps(message), 
+                mimetype='application/json')
+        Attendance.objects.filter(calendar=calendar, event=event).update(color=color)
+        message = {'success': True}
     else:
         message = {'success': False}
     return HttpResponse(simplejson.dumps(message), mimetype='application/json')
