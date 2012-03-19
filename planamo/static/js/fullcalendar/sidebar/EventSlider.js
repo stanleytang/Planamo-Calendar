@@ -17,7 +17,6 @@ function EventSlider(calendar, options) {
   var originalEvent = new Object(); // keeps a copy of the orignal state of currentEvent. 
                             // So if a user decides to cancel, we can revert
                             
-  
   //exports
 	t.render = render;
 	t.createAndViewEvent = createAndViewEvent;
@@ -28,17 +27,16 @@ function EventSlider(calendar, options) {
   t.close = close;
   t.completeEventCreation = completeEventCreation;
   t.setEventTextbox = setEventTextbox;
+  t.extended = extended;
 	
 	/* ical colors: custom orange (original is ff892e), green, red, blue, pink, purple */
 	var eventColorOptions = ['#ee7000', '#00ad38', '#f62725', 
 													 '#006ed5', '#c744b5', '#6144aa']; 
-	
-	/* gcal colors: red, blue, green, purple, pink, yellow, orange, aqua, grey */
-	//var eventColorOptions = ['#d06b64', '#a4bdfc', '#7ae7bf', '#dbadff', 
-		//'#ff887c', '#fbd75b', '#ffb878', '#46d6db', '#e1e1e1'];
-		
-	/* notification box - milliseconds to display before fading away */
-	var notificationBoxDelay = 3000;
+													 
+	/* notification box - milliseconds to display before fading away
+	 TODO - also initialized in calendar.html... some way of only having
+	 to declare once? */
+  var notificationBoxDelay = 3000;
 	
 	/**
 	 * Function: setEventTextbox
@@ -97,7 +95,7 @@ function EventSlider(calendar, options) {
 	
 	function setSliderKeyListeners() {
 		$(document).keydown(function (e) {
-			if (extended) {
+			if (t.extended) {
 				//ESC - cancel
 				if (e.keyCode == 27)  { 
 					$(".close-slider").click();
@@ -355,6 +353,7 @@ function EventSlider(calendar, options) {
 						currentEvent._id = currentEvent.id = data.eventID;
 						calendar.unselect();
 				    completeEventCreation();
+				    
 				    textbox.resetTextbox(); 
 				    calendar.renderEvent(currentEvent, true);
 						$("#notification-box-container").show().delay(notificationBoxDelay).fadeOut();
@@ -498,6 +497,9 @@ function EventSlider(calendar, options) {
 	 function completeEventCreation() {
 	   calendar.endEventCreation();
 	   showCorrectButtons();
+	   
+	  // Make copy of event
+    originalEvent = $.extend({}, currentEvent);
 	 }
 	
 	
@@ -874,7 +876,7 @@ function EventSlider(calendar, options) {
 		isTransitioning = true;
 		this.close($.proxy(function () {
 			slider.animate({ right: 0 }, 600);
-			extended = true;
+		  t.extended = true;
 			this.update(event);
 			isTransitioning = false;
 		}, this), forceCancel);
@@ -890,19 +892,19 @@ function EventSlider(calendar, options) {
 	* @param true to force cancel an event in the middle of creation process
 	*/
 	function close(callback, forceCancel) {
-    if (!extended) { // don't do anything if slider is already closed
+    if (!t.extended) { // don't do anything if slider is already closed
       callback && callback(forceCancel);
       return this;
     }
     
 	  clear(forceCancel);
 	  
-		if (extended) {
+		if (t.extended) {
 			calendar.highlightEvent();
 			// if extended, call the callback function after animation ends
 			slider.animate({ right: 280 }, { duration: 600,
 			  complete: function(){ callback && callback(forceCancel); } });
-			extended = false;
+			t.extended = false;
 			currentEvent = null; // reset the event
 		} else {
 			// if not extended, call the callback function immediately
@@ -998,6 +1000,7 @@ function EventSlider(calendar, options) {
 
        //Hack - for some reason, date gets changed in original event.
        //But the private variables date dont get changed
+       //TODO
        currentEvent.start = originalEvent._start;
        currentEvent.end = originalEvent._end;
 

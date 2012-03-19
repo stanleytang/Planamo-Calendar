@@ -168,6 +168,8 @@ def updateEvent(request):
     """
     if request.is_ajax() and request.method == 'POST':
         obj = request.POST
+        
+        color = None
 
         # Read in event object
         try:
@@ -184,10 +186,11 @@ def updateEvent(request):
             color = obj['color'].lower()
 
         except KeyError:
-            message = {'success': False}
-            print "Error reading valsues from event json"
-            return HttpResponse(simplejson.dumps(message),
-                mimetype='application/json')
+            #message = {'success': False}
+            #print "Error reading valsues from event json"
+            #return HttpResponse(simplejson.dumps(message),
+                #mimetype='application/json')
+            pass
 
         # Get event
         try:
@@ -205,15 +208,16 @@ def updateEvent(request):
         #    start_date=start_date, end_date=end_date)
 
         # Update attendance
-        try:
-            calendar = request.user.calendar
-        except ObjectDoesNotExist:
-            print "Calendar doesn't exist"
-            message = {'success': False}
-            return HttpResponse(simplejson.dumps(message), 
-                mimetype='application/json')
-        Attendance.objects.filter(calendar=calendar, event=event).update(color=color)
-        message = {'success': True}
+        if not color == None:
+            try:
+                calendar = request.user.calendar
+            except ObjectDoesNotExist:
+                print "Calendar doesn't exist"
+                message = {'success': False}
+                return HttpResponse(simplejson.dumps(message), 
+                    mimetype='application/json')
+            Attendance.objects.filter(calendar=calendar, event=event).update(color=color)
+        message = {'success': True}    
     else:
         message = {'success': False}
     return HttpResponse(simplejson.dumps(message), mimetype='application/json')
