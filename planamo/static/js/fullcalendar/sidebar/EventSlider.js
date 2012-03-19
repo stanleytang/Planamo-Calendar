@@ -96,12 +96,12 @@ function EventSlider(calendar, options) {
 	function setSliderKeyListeners() {
 		$(document).keydown(function (e) {
 			if (t.extended) {
-				//ESC - cancel
+				//ESC - cancel event
 				if (e.keyCode == 27)  { 
 					$(".close-slider").click();
 				} 
 				
-				//Enter - submit
+				//Enter - submit event
 				if (e.keyCode == 13) { 
 					$('.event-editable').blur();
 					if (calendar.isNewEventBeingCreated()) {
@@ -111,16 +111,19 @@ function EventSlider(calendar, options) {
 					}
 				}
 				
-				/*
-				//Delete - delete
-				if (e.keyCode == 46) { 
-					$('.event-editable').blur();
-					if (calendar.isNewEventBeingCreated()) {
-						$('#cancel-event-button').click();
-					} else {
-						$("#delete-event-button").click();
-					}
-				} */
+				//Delete - delete event
+				if (e.keyCode === 8) {
+				  var element = e.target.nodeName.toLowerCase();
+				  if ((element != 'input' && element != 'textarea') || $(e.target).attr("readonly")) {
+				    $('.event-editable').blur();
+				    if (calendar.isNewEventBeingCreated()) {
+  						$('#cancel-event-button').click();
+  					} else {
+  						$("#delete-event-button").click();
+  					}
+				    return false;
+				  }
+        }
 			}
 		});
 	}
