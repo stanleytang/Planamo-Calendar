@@ -13,7 +13,6 @@ function EventSlider(calendar, options) {
 	var isTransitioning = false;
   var slider = $('#event-slider-container');
   var textbox; // EventTextbox to keep communicate with
-  var updatedEvent = null;
   var originalEvent = new Object(); // keeps a copy of the orignal state of currentEvent. 
                             // So if a user decides to cancel, we can revert
                             
@@ -345,9 +344,9 @@ function EventSlider(calendar, options) {
 				data: {
 					'title': currentEvent.title,
 					'location': currentEvent.location,
-					'allday': currentEvent.allDay ? true : false,
-					'start_date': currentEvent.start.toUTCString(),
-					'end_date': currentEvent.end.toUTCString(),
+					'allDay': currentEvent.allDay ? true : false,
+					'start': currentEvent.start.toUTCString(),
+					'end': currentEvent.end.toUTCString(),
 					'notes': currentEvent.notes,
 					'color': rgb2hex(currentEvent.color)
 				},
@@ -382,20 +381,12 @@ function EventSlider(calendar, options) {
       }
 		});
 		doneEventButton.click(function () { 
-		  if (changesMadeToEvent()) {
+		  var updatedEventData = getChangesMadeToEvent();
+		  if (updatedEventData) {
 		    $.ajax({
     			type: 'POST',
     			url: '/cal/updateEvent/',
-    			data: {
-    			  'eventID': currentEvent.id,
-    				'title': currentEvent.title,
-    				'location': currentEvent.location,
-    				'allday': currentEvent.allDay ? true : false,
-    				'start_date': currentEvent.start.toUTCString(),
-    				'end_date': currentEvent.end.toUTCString(),
-    				'notes': currentEvent.notes,
-    				'color': rgb2hex(currentEvent.color)
-    			},
+    			data: updatedEventData,
     			success: function(data) {
     				if (data.success) {
     					close(null, true);
@@ -503,6 +494,8 @@ function EventSlider(calendar, options) {
 	   
 	  // Make copy of event
     originalEvent = $.extend({}, currentEvent);
+    originalEvent.start = currentEvent.start.clone();
+    originalEvent.end = currentEvent.end.clone();
 	 }
 	
 	
@@ -722,23 +715,42 @@ function EventSlider(calendar, options) {
 	/*** VIEWING ***/
 	
 	/**
-   * Function: changesMadeToEvent
+   * Function: getChangesMadeToEvent
    * ----------------------------
-   * Detects if changes have been made to the current event
+   * Detects if changes have been made to the current event.
+   * If so, create a new object that contains only the changed 
+   * values of the event. Otherwise, return NULL
    * NOTE: Only applies to current event. Ignores new events
    *
-   * @return True, if changes made. Otherwise, false
+   * @return Updated event values, or NULL
    */
-  function changesMadeToEvent() {
+  function getChangesMadeToEvent() {
+    var updatedEvent = {};
+    
+    //Hack fix - sometimes, fullcalendar automatically adds a few seconds to dates. TODO
+    currentEvent.start.setSeconds(0);
+    currentEvent.end.setSeconds(0);
+  
     if (currentEvent && !calendar.isNewEventBeingCreated()) {
       for (var name in currentEvent) {
         if (currentEvent.hasOwnProperty(name)) {
-          if (name === "highlight" || name == "source") continue;
-          if (currentEvent[name] != originalEvent[name]) return true;
+          if (name === "highlight" || name == "source" || name.indexOf("_") == 0) continue;
+          if (currentEvent[name] != originalEvent[name]) {
+            if (name == "allday") updatedEvent.allday = currentEvent.allDay ? true : false;
+            else if (name == "start") updatedEvent.start = currentEvent.start.toUTCString();
+            else if (name == "end") updatedEvent.end = currentEvent.end.toUTCString();
+            else if (name == "color") updatedEvent.color = rgb2hex(currentEvent.color);
+            else updatedEvent[name] = currentEvent[name];
+          }
         }
       }
     }
-    return false;
+    
+    //Add event id
+    if (!$.isEmptyObject(updatedEvent)) updatedEvent.eventID = currentEvent.id;
+    else updatedEvent = null;
+    
+    return updatedEvent;
   } 
   
 	/**
@@ -808,6 +820,8 @@ function EventSlider(calendar, options) {
 
     // Make copy of event
     originalEvent = $.extend({}, currentEvent);
+    originalEvent.start = currentEvent.start.clone();
+    originalEvent.end = currentEvent.end.clone();
 
 		//Resets size of event input boxes to fit content for new event
 		$("#event-title").data('AutoResizer').check(null, true);
@@ -990,7 +1004,9 @@ function EventSlider(calendar, options) {
 	 * @param return true if event is cancelled, otherwise false
 	 */
    function cancelEventChanges(forceCancel) {
-     if (changesMadeToEvent()) {
+     if (currentEvent == null) return true;
+     
+     if (getChangesMadeToEvent()) {
        if (!forceCancel) {
          var cancel = confirm("Your changes to the event isn't saved. Are you sure you to cancel?");
          if (!cancel) return false;
@@ -1000,12 +1016,6 @@ function EventSlider(calendar, options) {
            currentEvent[name] = originalEvent[name];
          }
        }
-
-       //Hack - for some reason, date gets changed in original event.
-       //But the private variables date dont get changed
-       //TODO
-       currentEvent.start = originalEvent._start;
-       currentEvent.end = originalEvent._end;
 
        calendar.updateEvent(currentEvent);
        //calendar.rerenderEvents(currentEvent.id);

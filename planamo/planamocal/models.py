@@ -87,6 +87,7 @@ class Attendance(models.Model):
     calendar = models.ForeignKey(Calendar)
     event = models.ForeignKey(Event)
     color = models.CharField(max_length=7, choices=COLOR_CHOICES)
+    notes = models.CharField(max_length=200, blank=True)
   
     class Meta(object):
         verbose_name_plural = "Attendance"
