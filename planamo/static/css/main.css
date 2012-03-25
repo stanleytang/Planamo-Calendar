@@ -357,6 +357,13 @@ textarea#add-event-textbox {
 		/* border: 1px solid red; */
 	}
 	
+	/* Event attendees box */
+	
+	#event-attendees-box {
+	  padding: 10px 10px 8px 15px; 
+	  display:none;
+	}
+	
 	/* Event slider buttons */
 	
 	#event-buttons div {

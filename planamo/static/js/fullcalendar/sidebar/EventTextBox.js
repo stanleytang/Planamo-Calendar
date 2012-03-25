@@ -132,9 +132,9 @@ function EventTextBox(slider, options) {
 			var nameString = textbox.val().substring(separator);
 			//temp
 			if (nameString.indexOf("Andy") != -1 || nameString.indexOf("andy") != -1) {
-				$("#friend-box").css('display', 'block');
+				$("#event-attendees-box").css('display', 'block');
 			} else {
-				$("#friend-box").css('display', 'none');
+				$("#event-attendees-box").css('display', 'none');
 			}
 			
 			

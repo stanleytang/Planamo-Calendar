@@ -86,6 +86,33 @@ function resizeSideBar() {
 	$("#event-slider-container").height(sidebarMainHeight);
 }
 
+/* notification box - milliseconds to display before fading away */
+var notificationBoxDelay = 3000;
+
+//Takes in an event update object and sends only the times to server
+function updateEventTimeToServer(event) {
+	$.ajax({
+		type: 'POST',
+		url: '/cal/updateEvent/',
+		data: {
+			'eventID': event.id,
+			'start': event.start.toUTCString(),
+			'end': event.end.toUTCString(),
+		},
+		success: function(data) {
+			if (data.success) {
+				close(null, true);
+				$("#notification-box-container").show().delay(notificationBoxDelay).fadeOut();
+				$("#notification-content").html("Successfully updated event to calendar");
+			} else {
+				$("#notification-box-container").show().delay(notificationBoxDelay).fadeOut();
+				$("#notification-content").html("Error updating event");
+			}
+		},
+		dataType: 'json'
+	});
+}
+
 	$(document).ready(function() {
 
 		var date = new Date();
@@ -142,15 +169,20 @@ function resizeSideBar() {
 			    return;
 			  // TODO deal with repeating event
 				slider.viewEvent(event);
-				if (!calendar.fullCalendar('isNewEventBeingCreated')) {
-					calendar.fullCalendar('highlightEvent', event);
-				}
 			},
 			eventResize: function(event) {
 			  slider.update(event);
+			
+				if (!slider.extended) {
+					updateEventTimeToServer(event);
+				}
 			},
 			eventDrop: function(event) {
 			  slider.update(event);
+			
+				if (!slider.extended) {
+					updateEventTimeToServer(event);
+				}
 			},
 			events: '/cal/jsonfeed/'
 		});
