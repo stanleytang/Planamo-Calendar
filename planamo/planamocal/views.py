@@ -30,8 +30,9 @@ def jsonfeed(request):
     for event in events:
         attendance = get_object_or_404(Attendance,
             calendar=request.user.calendar, event=event)
-        json_object = event.json()
+        json_object = event.json(request.user)
         json_object['color'] = attendance.color
+        
         data.append(json_object)
     return HttpResponse(simplejson.dumps(data), mimetype='application/json')
 
@@ -72,6 +73,8 @@ def createEvent(request):
                 "%a, %d %b %Y %H:%M:%S %Z")
             end_date = datetime.strptime(obj['end_date'],
                 "%a, %d %b %Y %H:%M:%S %Z")
+            # Django 1.3 DateTimeField does not store tzinfo, assumed to be UTC
+            # conversions to local time are made in the models.py file
             color = obj['color'].lower()
                     
         except KeyError:

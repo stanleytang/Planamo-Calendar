@@ -137,7 +137,7 @@ INSTALLED_APPS = (
 REGISTRATION_OPEN = True
 
 
-AUTH_PROFILE_MODULE = 'planamocal.UserProfile'
+AUTH_PROFILE_MODULE = 'accounts.UserProfile'
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

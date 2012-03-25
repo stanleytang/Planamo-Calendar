@@ -1,4 +1,6 @@
 from datetime import datetime, timedelta
+import pytz
+from pytz import timezone
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.query import QuerySet
@@ -49,14 +51,21 @@ class Event(models.Model):
     
     objects = EventManager()
     
-    def json(self):
+    def json(self, user):
+        event_tz = timezone(user.get_profile().timezone)
+        fmt = '%Y-%m-%d %H:%M:%S %Z%z'
+        localized_start = \
+            self.start_date.replace(tzinfo=pytz.utc).astimezone(event_tz)
+        localized_end = \
+            self.end_date.replace(tzinfo=pytz.utc).astimezone(event_tz)
+
         return {
             'id': self.id,
             'title': self.title,
             'location': self.location,
             'allDay': self.allday,
-            'start': self.start_date.isoformat(),
-            'end': self.end_date.isoformat(),
+            'start': localized_start.isoformat(),
+            'end': localized_end.isoformat(),
         }
     
     def __unicode__(self):
