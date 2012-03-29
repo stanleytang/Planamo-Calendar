@@ -22,7 +22,5 @@ $(document).ready(function() {
             summerTZName+"/"+winterTZName : winterTZName+"/"+summerTZName;
     }
     
-    tzField.val(finalTZName);
-    // TODO have tzField set by timezone offset instead of tz name
-    
+    tzField.val(finalTZName);    
 });

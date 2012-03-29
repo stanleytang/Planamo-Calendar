@@ -6,7 +6,7 @@ from django.utils import simplejson
 from datetime import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
-
+from pytz import timezone
 
 @login_required
 def index(request):
@@ -68,14 +68,28 @@ def createEvent(request):
             location = obj.get('location','')
             allday = obj['allDay']
             allday = get_boolean(allday)
-            start_date = datetime.strptime(obj['start'], 
-                "%a, %d %b %Y %H:%M:%S %Z")
+            
+            # Remove the timezone offset from the date strings
+            start_offset_index = obj['start'].find('-')
+            end_offset_index = obj['end'].find('-')
+            
+            start_string = (obj['start'][:start_offset_index] if
+                (start_offset_index != -1) else obj['start'])
+            end_string = (obj['end'][:end_offset_index] if
+                (end_offset_index != -1) else obj['end'])
+            
+            print 'oh no!'
+            user_timezone = timezone(request.user.get_profile().timezone)
+            start_date = datetime.strptime(start_string,
+                "%a %b %d %Y %H:%M:%S %Z")
             start_date.replace(second=0) # TODO - temp hack
-            end_date = datetime.strptime(obj['end'],
-                "%a, %d %b %Y %H:%M:%S %Z")
+            start_date = user_timezone.localize(start_date)
+            end_date = datetime.strptime(end_string,
+                "%a %b %d %Y %H:%M:%S %Z")
             end_date.replace(second=0) # TODO - temp hack
-            # Django 1.3 DateTimeField does not store tzinfo, assumed to be UTC
-            # conversions to local time are made in the models.py file
+            end_date = user_timezone.localize(end_date)
+            # Django 1.3 DateTimeField does not store tzinfo, so the time stored
+            # in the model is assumed to be UTC
             color = obj['color'].lower()
             notes = obj.get('notes', '')              
         except KeyError:

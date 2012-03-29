@@ -345,8 +345,8 @@ function EventSlider(calendar, options) {
 					'title': currentEvent.title,
 					'location': currentEvent.location,
 					'allDay': currentEvent.allDay ? true : false,
-					'start': currentEvent.start.toUTCString(),
-					'end': currentEvent.end.toUTCString(),
+					'start': currentEvent.start.toString(),
+					'end': currentEvent.end.toString(),
 					'notes': currentEvent.notes,
 					'color': rgb2hex(currentEvent.color)
 				},

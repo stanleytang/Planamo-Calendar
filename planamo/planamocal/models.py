@@ -52,12 +52,12 @@ class Event(models.Model):
     objects = EventManager()
     
     def json(self, user):
+        # Set up time so that client can display
         event_tz = timezone(user.get_profile().timezone)
-        fmt = '%Y-%m-%d %H:%M:%S %Z%z'
-        localized_start = \
-            self.start_date.replace(tzinfo=pytz.utc).astimezone(event_tz)
-        localized_end = \
-            self.end_date.replace(tzinfo=pytz.utc).astimezone(event_tz)
+        localized_start = (self.start_date.
+            replace(tzinfo=pytz.utc).astimezone(event_tz).astimezone(pytz.utc))
+        localized_end = (self.end_date.
+            replace(tzinfo=pytz.utc).astimezone(event_tz).astimezone(pytz.utc))
 
         return {
             'id': self.id,
