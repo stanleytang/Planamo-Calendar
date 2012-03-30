@@ -399,6 +399,8 @@ function EventSlider(calendar, options) {
     			},
     			dataType: 'json'
     		});
+		  } else {
+		    close(null, true);
 		  }
 		});
 		deleteEventButton.click(function () { 
@@ -730,17 +732,24 @@ function EventSlider(calendar, options) {
     //Hack fix - sometimes, fullcalendar automatically adds a few seconds to dates. TODO
     currentEvent.start.setSeconds(0);
     currentEvent.end.setSeconds(0);
+    originalEvent.start.setSeconds(0);
+    originalEvent.end.setSeconds(0);
   
     if (currentEvent && !calendar.isNewEventBeingCreated()) {
       for (var name in currentEvent) {
         if (currentEvent.hasOwnProperty(name)) {
           if (name === "highlight" || name == "source" || name.indexOf("_") == 0) continue;
-          if (currentEvent[name] != originalEvent[name]) {
-            if (name == "allday") updatedEvent.allday = currentEvent.allDay ? true : false;
-            else if (name == "start") updatedEvent.start = currentEvent.start.toUTCString();
-            else if (name == "end") updatedEvent.end = currentEvent.end.toUTCString();
-            else if (name == "color") updatedEvent.color = rgb2hex(currentEvent.color);
-            else updatedEvent[name] = currentEvent[name];
+          if (name == "start" || name == "end") {
+            if (currentEvent[name].toString() != originalEvent[name].toString()) {
+              if (name == "start") updatedEvent.start = currentEvent.start.toString();
+              if (name == "end") updatedEvent.end = currentEvent.end.toString();
+            }
+          } else {
+            if (currentEvent[name] != originalEvent[name]) {
+              if (name == "allday") updatedEvent.allday = currentEvent.allDay ? true : false;
+              else if (name == "color") updatedEvent.color = rgb2hex(currentEvent.color);
+              else updatedEvent[name] = currentEvent[name];
+            }
           }
         }
       }
@@ -821,7 +830,7 @@ function EventSlider(calendar, options) {
     // Make copy of event
     originalEvent = $.extend({}, currentEvent);
     originalEvent.start = currentEvent.start.clone();
-    originalEvent.end = currentEvent.end.clone();
+    if (originalEvent.end) originalEvent.end = currentEvent.end.clone();
 
 		//Resets size of event input boxes to fit content for new event
 		$("#event-title").data('AutoResizer').check(null, true);

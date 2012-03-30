@@ -96,8 +96,8 @@ function updateEventTimeToServer(event) {
 		url: '/cal/updateEvent/',
 		data: {
 			'eventID': event.id,
-			'start': event.start.toUTCString(),
-			'end': event.end.toUTCString(),
+			'start': event.start.toString(),
+			'end': event.end.toString(),
 		},
 		success: function(data) {
 			if (data.success) {
