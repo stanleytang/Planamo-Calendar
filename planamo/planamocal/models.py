@@ -55,9 +55,9 @@ class Event(models.Model):
         # Set up time so that client can display
         event_tz = timezone(user.get_profile().timezone)
         localized_start = (self.start_date.
-            replace(tzinfo=pytz.utc).astimezone(event_tz).astimezone(pytz.utc))
+            replace(tzinfo=pytz.utc).astimezone(event_tz))
         localized_end = (self.end_date.
-            replace(tzinfo=pytz.utc).astimezone(event_tz).astimezone(pytz.utc))
+            replace(tzinfo=pytz.utc).astimezone(event_tz))
 
         return {
             'id': self.id,

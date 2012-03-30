@@ -209,6 +209,7 @@ function parseISO8601(s, ignoreTimezone) { // ignoreTimezone defaults to false
 			date = new Date(+date + (offset * 60 * 1000));
 		}
 	}
+
 	return date;
 }
 
