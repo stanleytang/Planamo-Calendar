@@ -830,7 +830,7 @@ function EventSlider(calendar, options) {
     // Make copy of event
     originalEvent = $.extend({}, currentEvent);
     originalEvent.start = currentEvent.start.clone();
-    if (originalEvent.end) originalEvent.end = currentEvent.end.clone();
+    originalEvent.end = currentEvent.end.clone();
 
 		//Resets size of event input boxes to fit content for new event
 		$("#event-title").data('AutoResizer').check(null, true);

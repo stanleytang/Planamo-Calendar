@@ -6,19 +6,19 @@
 <link rel='stylesheet' type='text/css' href='/mymedia/jquery/ui-themes/planamo/theme.css' />
 <link rel='stylesheet' type='text/css' href='/mymedia/css/fullcalendar/fullcalendar.css' />
 <link rel='stylesheet' type='text/css' media='print' href='/mymedia/css/fullcalendar/fullcalendar.print.css' />
-<link rel='stylesheet' type='text/css' href='/mymedia/js/lionbars.min/lionbars.css' />
+<link rel='stylesheet' type='text/css' href='/mymedia/js/util/lionbars.min/lionbars.css' />
 
 <script type='text/javascript' src='/mymedia/jquery/jquery-1.7.1.min.js'></script> 
 <script type='text/javascript' src='/mymedia/jquery/jquery-ui-1.8.16.custom.min.js'></script>
 <script type='text/javascript' src='/mymedia/js/fullcalendar/_loader.js'></script>
-<script type='text/javascript' src='/mymedia/js/sidebar.js'></script>
-<script type='text/javascript' src='/mymedia/js/date.js'></script>
-<script type='text/javascript' src='/mymedia/js/jquery.editinplace.js'></script>
-<script type='text/javascript' src='/mymedia/js/jquery.maskedinput-1.3.js'></script>
-<script type='text/javascript' src='/mymedia/js/timepicker.js'></script>
-<script type='text/javascript' src='/mymedia/js/compareColors.js'></script>
-<script type='text/javascript' src='/mymedia/js/autoresize.jquery.js'></script>
-<script type='text/javascript' src='/mymedia/js/lionbars.min/jquery.lionbars.0.3.js'></script> 
+<script type='text/javascript' src='/mymedia/js/sidebar/StickyNotes.js'></script>
+<script type='text/javascript' src='/mymedia/js/util/date.js'></script>
+<script type='text/javascript' src='/mymedia/js/util/jquery.editinplace.js'></script>
+<script type='text/javascript' src='/mymedia/js/util/jquery.maskedinput-1.3.js'></script>
+<script type='text/javascript' src='/mymedia/js/util/timepicker.js'></script>
+<script type='text/javascript' src='/mymedia/js/util/compareColors.js'></script>
+<script type='text/javascript' src='/mymedia/js/util/autoresize.jquery.js'></script>
+<script type='text/javascript' src='/mymedia/js/util/lionbars.min/jquery.lionbars.0.3.js'></script> 
 
 
 <script type='text/javascript'>
@@ -189,7 +189,8 @@ function updateEventTimeToServer(event) {
 
 		var slider = calendar.fullCalendar('slider');
 
-		var sidebar = new SideBar();
+		//var sidebar = new SideBar();
+		var sidebar = new StickyNotes();
 
 		/* Dynamically resize height for calendar and sidebar */
 		$(window).resize(function() {

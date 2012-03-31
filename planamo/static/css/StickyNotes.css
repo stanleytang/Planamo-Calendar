@@ -1,0 +1,91 @@
+/* Sticky Notes 
+---------------------------------------------- */
+	
+#sticky-notes {
+	padding-top:5px;
+}
+
+#sticky-notes .note{
+	margin:5px 2px 2px 0px;
+	background:#f9f8c3; /* yellow temp */
+	position:relative;
+	border:1px solid #ddd;
+	-moz-border-radius:5px;
+	-webkit-border-radius:5px;
+	width: 250px;
+}
+#sticky-notes .note .sticky-note-title{
+	margin:0;
+	min-height: 15px;
+	font-size:12px;
+	padding:5px 25px 5px 5px;
+	background:#fcf6a3; /*dark yellow - temp */
+	color:#000;
+	border-bottom:1px solid #eee;
+	font-family: Verdana;
+	font-weight: bold;
+	cursor:move;
+}
+
+#sticky-notes .note .sticky-note-title-edit {
+	font-family: Verdana;
+	font-size: 12px;
+	font-weight: bold;
+	height: 15px;
+	resize: none;
+	margin: -2px 0px -5px -2px;
+	width: 225px;
+	background-color: #fff;
+	border: none;
+}
+
+#sticky-notes .note-content{
+	background-color: transparent;
+	min-height:100px; 
+	margin:5px;
+	font-family:'Lucida Grande', Verdana; font-size:0.8em; line-height:1.5em;
+}
+#sticky-notes .placeholder{ /* need to change this */
+	background: #f0f0f0;
+	border:1px dashed #ddd;
+}
+
+#sticky-notes .note .sticky-note-title.collapse{
+	background: #fcf6a3 url('../images/stickynotes-collapse.png') no-repeat top right;
+}
+
+#sticky-notes textarea {
+	font-size: 14px;
+	width: 100%;
+	background-color: transparent;
+}
+
+#sticky-notes .note-editable {
+	background-color: transparent;
+	border: none;
+	resize: none;
+	font-family: "Chalkboard",Helvetica,Arial,Verdana,sans-serif;
+}
+
+#sticky-notes .note-editable:focus {
+	outline: none;
+}
+
+#add-new-note-box {
+	border: 2px dashed #43494d;
+	margin-top: 10px;
+	padding-top: 25px;
+	width: 250px;
+	height: 50px;
+	border-radius: 15px; /* TODO: rounded corners does not dash. maybe replace with image */
+	cursor: pointer;
+}
+
+#add-new-note-box:hover {
+	background-color: #bfc1c1;
+}
+
+.clear {
+	clear: fixed;
+	height: 20px;
+}
