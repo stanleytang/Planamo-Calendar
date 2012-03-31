@@ -331,7 +331,7 @@ function EventManager(options, _sources) {
 	
 	
 	/* Loading State
-	-----------------------------------------------------------------------------*/
+	--------------------------------------------------------------------------*/
 	
 	
 	function pushLoading() {
@@ -348,7 +348,7 @@ function EventManager(options, _sources) {
 	}
 	
 	/* Event Creation
-	-----------------------------------------------------------------------------*/
+	--------------------------------------------------------------------------*/
 
   /**
    * Function: isNewEventBeingCreated
@@ -418,7 +418,7 @@ function EventManager(options, _sources) {
   }
 	
 	/* Event Normalization
-	-----------------------------------------------------------------------------*/
+	--------------------------------------------------------------------------*/
 	
 	
 	function normalizeEvent(event) {
@@ -435,8 +435,9 @@ function EventManager(options, _sources) {
 		}
 		event._start = cloneDate(event.start = parseDate(event.start, ignoreTimezone));
 		event.end = parseDate(event.end, ignoreTimezone);
-		if (event.end && event.end <= event.start) {
-			event.end = null;
+		if ((event.end && event.end <= event.start) || !event.end) {
+			event.end = new Date(+event.start + 1*1000*3600);
+			// if end date is corrupt, set it to one hour ahead of event.start
 		}
 		event._end = event.end ? cloneDate(event.end) : null;
 		if (event.allDay === undefined) {
@@ -457,7 +458,7 @@ function EventManager(options, _sources) {
 	
 	
 	/* Utils
-	------------------------------------------------------------------------------*/
+	--------------------------------------------------------------------------*/
 	
 	
 	function normalizeSource(source) {
