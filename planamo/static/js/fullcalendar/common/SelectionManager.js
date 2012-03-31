@@ -64,11 +64,11 @@ function SelectionManager() {
 	}
 	
 	
-	function daySelectionMousedown(ev) { // not really a generic manager method, oh well
+	function daySelectionMousedown(ev) { // not really a generic manager method
 		var cellDate = t.cellDate;
 		var cellIsAllDay = t.cellIsAllDay;
 		var hoverListener = t.getHoverListener();
-		var reportDayClick = t.reportDayClick; // this is hacky and sort of weird
+		var reportDayClick = t.reportDayClick; // this is hacky / sort of weird
 		if (ev.which == 1 && opt('selectable')) { // which==1 means left mouse button
 			unselect(ev);
 			var _mousedownElement = this;
@@ -103,6 +103,4 @@ function SelectionManager() {
 			});
 		}
 	}
-
-
 }
