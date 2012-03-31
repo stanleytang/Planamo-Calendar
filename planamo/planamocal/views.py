@@ -87,8 +87,6 @@ def createEvent(request):
             allday = get_boolean(allday)
             
             # Get date and adjust timezone offsets
-            # Django 1.3 DateTimeField does not store tzinfo, so the time stored
-            # in the model is assumed to be UTC
             user_timezone = timezone(request.user.get_profile().timezone)
             start_date = adjustDateStringToTimeZone(user_timezone=user_timezone, 
                 date_string=obj['start'])
