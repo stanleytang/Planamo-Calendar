@@ -77,6 +77,10 @@ function SelectionManager() {
 				clearSelection();
 				if (cell && cellIsAllDay(cell)) {
 					dates = [ cellDate(origCell), cellDate(cell) ].sort(cmp);
+					dates[0] = new Date(+dates[0] + 1000*3600*12);
+					    // make all-day til noon
+					dates[1] = new Date(+dates[0] + 1000*3600);
+					    // make end date 1 hour past start date
 					renderSelection(dates[0], dates[1], true);
 				}else{
 					dates = null;
