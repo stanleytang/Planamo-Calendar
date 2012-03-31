@@ -338,6 +338,13 @@ function EventSlider(calendar, options) {
 		
 		//button callbacks
 		addEventButton.click(function () {
+		  
+		  //Weird bug where all day event times gets messed up
+		  if (currentEvent.allDay) {
+		    currentEvent.start.setHours(12);
+		    currentEvent.end.setHours(13);
+		  }
+		  
 			$.ajax({
 				type: 'POST',
 				url: '/cal/createEvent/',
@@ -494,10 +501,10 @@ function EventSlider(calendar, options) {
 	   calendar.endEventCreation();
 	   showCorrectButtons();
 	   
-	  // Make copy of event
-    originalEvent = $.extend({}, currentEvent);
-    originalEvent.start = currentEvent.start.clone();
-    originalEvent.end = currentEvent.end.clone();
+	   // Make copy of event
+	   originalEvent = $.extend({}, currentEvent);
+	   originalEvent.start = currentEvent.start.clone();
+	   originalEvent.end = currentEvent.end.clone();
 	 }
 	
 	
