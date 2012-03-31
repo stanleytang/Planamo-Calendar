@@ -1,11 +1,10 @@
 from datetime import datetime, timedelta
 import pytz
-from pytz import timezone
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.query import QuerySet
 from django.db.models.signals import post_save
-from django.utils import simplejson
+from django.utils import simplejson, timezone
 
 def today():
     """
@@ -53,11 +52,10 @@ class Event(models.Model):
     
     def json(self, user):
         # Set up time so that client can display
-        event_tz = timezone(user.get_profile().timezone)
-        localized_start = (self.start_date.
-            replace(tzinfo=pytz.utc).astimezone(event_tz))
-        localized_end = (self.end_date.
-            replace(tzinfo=pytz.utc).astimezone(event_tz))
+        event_tz = pytz.timezone(user.get_profile().timezone)
+        
+        localized_start = self.start_date.astimezone(event_tz)
+        localized_end = self.end_date.astimezone(event_tz)
 
         return {
             'id': self.id,
