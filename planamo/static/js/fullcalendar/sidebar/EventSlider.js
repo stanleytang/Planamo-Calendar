@@ -16,17 +16,17 @@ function EventSlider(calendar, options) {
   var originalEvent = new Object(); // keeps a copy of the orignal state of currentEvent. 
                             // So if a user decides to cancel, we can revert
                             
-  //exports
+    //exports
 	t.render = render;
 	t.createAndViewEvent = createAndViewEvent;
-  t.viewEvent = viewEvent;
-  t.update = update;
-  t.clear = clear;
-  t.triggerSlider = triggerSlider;
-  t.close = close;
-  t.completeEventCreation = completeEventCreation;
-  t.setEventTextbox = setEventTextbox;
-  t.extended = extended;
+    t.viewEvent = viewEvent;
+    t.update = update;
+    t.clear = clear;
+    t.triggerSlider = triggerSlider;
+    t.close = close;
+    t.completeEventCreation = completeEventCreation;
+    t.setEventTextbox = setEventTextbox;
+    t.extended = extended;
 	
 	/* ical colors: custom orange (original is ff892e), green, red, blue, pink, purple */
 	var eventColorOptions = ['#ee7000', '#00ad38', '#f62725', 
