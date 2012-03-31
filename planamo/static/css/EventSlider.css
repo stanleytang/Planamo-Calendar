@@ -1,0 +1,178 @@
+/* Event Slider
+----------------------------*/
+
+#event-slider-container {
+	height: auto; /* dynamically calculated by js */
+  width: 280px;
+	right: 280px;
+	position: absolute;
+	z-index: 10; /* goes on top of sidebar */
+	background-color: #FFF;
+	overflow: hidden;
+}
+
+	/* Event header */
+	
+	#event-slider-container #event-header {
+		background: #d5deec;
+		width: 280px;
+	}
+	
+	#event-header #event-title-container {
+		width: 245px;
+		padding: 12px 20px 10px 15px;
+	}
+
+	#event-header .close-slider {
+		position: absolute;
+		width: 10px;
+		right: 10px;
+		top: 5px;
+		cursor: pointer;
+		color: #888;
+	}
+	
+	#event-header .close-slider:hover {
+		text-decoration: underline;
+		color: #444;
+	}
+
+	/* Event details */
+	
+	#event-content table {
+		border-top: 2px solid #e5e5e5;
+		border-bottom: 2px solid #e5e5e5;
+		vertical-align: middle;
+	}
+	
+	#event-content .first {
+		padding-top: 10px;
+	}
+	
+	#event-content .last {
+		padding-bottom: 10px;
+	}
+	
+	#event-content .detail-name {
+		width: 27%;
+		text-align: right;
+		background-color: #e5e5e5;
+		color: #939292;
+		padding-right: 12px;
+	}
+	
+	#event-content .detail-input {
+		padding-left: 13px;
+	}
+	
+	#event-content .event-color {
+		width: 14px;
+		height: 14px;
+		margin-top:4px;
+		margin-right: 4px;
+		background-color: #ddd;
+		display: inline-block;
+		cursor: pointer;
+	}
+	
+	#event-content .event-color:hover {
+		border: 1px solid black; 
+		margin: 3px 2px -1px 0px;
+	}
+	
+	#event-content .event-color-selected {
+		background: url('../images/tick.png');
+	}
+	
+	/* Event input boxes */
+	
+	#event-slider-container textarea#event-title {
+		font-size: 14px;
+		font-weight: bold;
+		width: 235px;
+	}
+	
+	#event-slider-container textarea#event-title:hover {
+		background-color: #b1c2dc;
+	}
+	
+	#event-slider-container textarea#event-title:focus {
+		background-color: white;
+	}
+	
+	#event-slider-container .event-editable {
+		background-color: transparent;
+		border: none;
+		resize: none;
+		font-family: "Lucida Sans",Helvetica,Arial,Verdana,sans-serif;
+		font-size: 12px;
+		height: 14px;
+		width: 170px;
+	}
+	
+	#event-slider-container .event-editable:hover {
+		background-color: #f0f5fa;
+	}
+	
+	#event-slider-container .event-editable:focus{
+		outline: none;
+		background-color: white;
+		box-shadow: 2px 2px 5px #444444;
+		-moz-box-shadow: 2px 2px 5px #444444;
+		-webkit-box-shadow: 2px 2px 5px #444444;
+		/* border: 1px solid red; */
+	}
+	
+	/* Event attendees box */
+	
+	#event-attendees-box {
+	  padding: 10px 10px 8px 15px; 
+	  display:none;
+	}
+	
+	/* Event slider buttons */
+	
+	#event-buttons div {
+		display: inline-block;
+		padding: 5px;
+		margin: 5px;
+	}
+
+	#event-buttons div:hover {
+		background-color: #ddd;
+		cursor: pointer;
+	}
+	
+
+/* Timepicker */
+------------------------------------------------------------------------*/
+
+.ui-timepicker-div .ui-widget-header {
+	margin-bottom: 8px;
+}
+
+.ui-timepicker-div dl {
+	text-align: left;
+}
+
+.ui-timepicker-div dl dt {
+	height: 25px;
+	margin-bottom: -25px;
+}
+
+.ui-timepicker-div dl dd {
+	margin: 0 10px 10px 65px;
+}
+
+.ui-timepicker-div td {
+	font-size: 90%;
+}
+
+.ui-tpicker-grid-label {
+	background: none;
+	border: none;
+	margin: 0;
+	padding: 0;
+}
+
+
