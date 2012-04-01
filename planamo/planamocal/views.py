@@ -6,6 +6,7 @@ from django.utils import simplejson
 from datetime import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 import pytz
 
 @login_required
@@ -24,6 +25,8 @@ def jsonfeed(request):
     Returns all the events associated with that calendar in JSON within a
     specified time interval
     """
+    NEVER_ENDS = datetime.fromtimestamp(0, pytz.utc)
+    
     # Gets URL parameters, which should be in the form of JavaScript Date object
     # toString() method
     start_date = request.GET.get('start', '0')
@@ -39,8 +42,9 @@ def jsonfeed(request):
     end_date = adjustDateStringToTimeZone(user_timezone, end_date, False)
     
     events = (Event.objects.
-        filter(attendance__calendar=request.user.calendar,
-        end_date__gt=start_date, start_date__lt=end_date))
+        filter(Q(end_date__gt=start_date) | Q(end_date=NEVER_ENDS),
+        attendance__calendar=request.user.calendar,
+        start_date__lt=end_date))
         
     for event in events:
         attendance = get_object_or_404(Attendance,
@@ -266,7 +270,8 @@ def updateEvent(request):
                         except KeyError:
                             pass
                         alldayKeyExtracted = True
-                    user_timezone = timezone(request.user.get_profile().timezone)
+                    user_timezone = \
+                        pytz.timezone(request.user.get_profile().timezone)
                     start_date = adjustDateStringToTimeZone(user_timezone=user_timezone, 
                         date_string=obj['start'], allday=event.allday)
                     event.start_date = start_date
@@ -277,7 +282,8 @@ def updateEvent(request):
                         except KeyError:
                             pass
                         alldayKeyExtracted = True
-                    user_timezone = timezone(request.user.get_profile().timezone)
+                    user_timezone = \
+                        pytz.timezone(request.user.get_profile().timezone)
                     end_date = adjustDateStringToTimeZone(user_timezone=user_timezone, 
                         date_string=obj['end'], allday=event.allday)
                     event.end_date = end_date

@@ -6,49 +6,54 @@ from django.db.models.query import QuerySet
 from django.db.models.signals import post_save
 from django.utils import simplejson, timezone
 
-def today():
-    """
-    Returns a tuple of two datetime instances: the beginning of today, and the 
-    end of today.
-    """
-    now = datetime.now()
-    start = datetime.min.replace(year=now.year, month=now.month, day=now.day)
-    end = (start + timedelta(days=1)) - timedelta.resolution
-    return (start, end)
+"""
+Unless otherwise stated, all date-related fields are stored in UTC timezone.
+"""
 
-class EventQuerySet(QuerySet):
-    """
-    A very simple ``QuerySet`` subclass which adds only one extra method,
-    ``today``, which returns only those objects whose ``creation_date`` falls
-    within the bounds of today.
-    """
-    def today(self):
-        """
-        Filters down to only those objects whose ``creation_date`` falls within
-        the bounds of today.
-        """
-        return self.filter(creation_date__range=today())
-
-class EventManager(models.Manager):
-    """
-    A very simple ``Manager`` subclass which returns an ``EventQuerySet``
-    instead of the typical ``QuerySet``.  It also includes a proxy for the extra
-    ``today`` method that is provided by the ``EventQuerySet`` subclass.
-    """
-    def get_query_set(self):
-        return EventQuerySet(self.model)
-
-    def today(self):
-        return self.get_query_set().today()
+# def today():
+#     """
+#     Returns a tuple of two datetime instances: the beginning of today, and the 
+#     end of today.
+#     """
+#     now = datetime.now()
+#     start = datetime.min.replace(year=now.year, month=now.month, day=now.day)
+#     end = (start + timedelta(days=1)) - timedelta.resolution
+#     return (start, end)
+#
+# class EventQuerySet(QuerySet):
+#     """
+#     A very simple ``QuerySet`` subclass which adds only one extra method,
+#     ``today``, which returns only those objects whose ``creation_date`` falls
+#     within the bounds of today.
+#     """
+#     def today(self):
+#         """
+#         Filters down to only those objects whose ``creation_date`` falls within
+#         the bounds of today.
+#         """
+#         return self.filter(creation_date__range=today())
+# 
+# class EventManager(models.Manager):
+#     """
+#     A very simple ``Manager`` subclass which returns an ``EventQuerySet``
+#     instead of the typical ``QuerySet``.  It also includes a proxy for the extra
+#     ``today`` method that is provided by the ``EventQuerySet`` subclass.
+#     """
+#     def get_query_set(self):
+#         return EventQuerySet(self.model)
+# 
+#     def today(self):
+#         return self.get_query_set().today()
 
 class Event(models.Model):
     title = models.CharField(max_length=100)
     location = models.CharField(max_length=100, blank=True)
     allday = models.BooleanField(default=True)
+    repeating = models.BooleanField(default=False)
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
     
-    objects = EventManager()
+    # objects = EventManager()
     
     def json(self, user):
         # Set up time so that client can display
@@ -67,12 +72,38 @@ class Event(models.Model):
             'title': self.title,
             'location': self.location,
             'allDay': self.allday,
+            'repeating': self.repeating,
             'start': localized_start.isoformat(),
             'end': localized_end.isoformat(),
         }
     
     def __unicode__(self):
         return self.title
+
+class RepeatingEvent(Event):
+    REPEAT_CHOICES = (
+        (1, 'Daily'),
+        (2, 'Weekly'),
+        (3, 'Monthly'),
+        (4, 'Yearly'),
+    )
+    
+    repeat_interval = models.IntegerField(choices=REPEAT_CHOICES)
+    instance_day_of_month = models.PositiveIntegerField(default=0)
+        # only used with yearly/monthly (0 for other repeat options)
+    instance_month = models.PositiveIntegerField(default=0)
+        # only used with yearly (0 for other options)
+    instance_start_time = models.TimeField() # stored in user's timezone
+    instance_end_time = models.TimeField()   # stored in user's timezone
+    
+    
+class RepeatingEventException(models.Model):
+    root_event = models.ForeignKey(RepeatingEvent, related_name='exception_set')
+    supposed_start_date = models.DateTimeField()
+    exception_event = models.OneToOneField(Event, null=True)
+        # null if event exception was a delete
+    
+    
         
 class Calendar(models.Model):
     owner = models.OneToOneField(User)
