@@ -35,8 +35,8 @@ def jsonfeed(request):
         return HttpResponse(simplejson.dumps(data), mimetype='application/json')
     
     user_timezone = pytz.timezone(request.user.get_profile().timezone)
-    start_date = adjustDateStringToTimeZone(user_timezone, start_date)
-    end_date = adjustDateStringToTimeZone(user_timezone, end_date)
+    start_date = adjustDateStringToTimeZone(user_timezone, start_date, False)
+    end_date = adjustDateStringToTimeZone(user_timezone, end_date, False)
     
     events = (Event.objects.
         filter(attendance__calendar=request.user.calendar,
