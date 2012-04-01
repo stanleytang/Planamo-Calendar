@@ -228,7 +228,7 @@ function EventSlider(calendar, options) {
 			"<tr>" +
 		    "<td class='detail-name'>" + eventDetailName + ":</td>" +
 		    "<td class='detail-input'>" + renderEventDetailInput(eventDetailName) + "</td>" +
-		  "</tr>"
+		    "</tr>"
 			);
 		}
 		
@@ -908,7 +908,7 @@ function EventSlider(calendar, options) {
             t.extended = true;
             this.update(event);
             isTransitioning = false;
-            }, this), forceCancel);
+        }, this), forceCancel);
         return this;
     }
 

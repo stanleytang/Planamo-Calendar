@@ -149,19 +149,21 @@ function EventManager(options, _sources) {
 				$.ajax($.extend({}, ajaxDefaults, source, {
 					data: data,
 					success: function(events) {
-					    // Clear the cache, but figure out if any of the cached
-					    // events were highlighted, and highlight the respective
-					    // event from the jsonfeed
-					    cache = [];
 						events = events || [];
-						if (prevHighlightedEvent) {
-						    for (var i = 0; i < events.length; i++) {
-						        if (prevHighlightedEvent.id == events[i].id) {
-						            events[i].highlight = true;
-						            break;
-						        }
-						    }
-						}
+						
+						//Add highlighted event to cache
+	                    if (prevHighlightedEvent && (!cache[0] || cache[0].id != prevHighlightedEvent.id)) 
+	                        cache.push(prevHighlightedEvent);
+						
+						//Remove highlighted event from json source
+						if (cache[0]) {
+                            for (var i = 0; i < events.length; i++) {
+                                if (events[i].id == cache[0].id) {
+                                    events.splice(i, 1);
+                                    break;
+                                }
+                            }
+                        }
 						
 						var res = applyAll(success, this, arguments);
 						if ($.isArray(res)) {
