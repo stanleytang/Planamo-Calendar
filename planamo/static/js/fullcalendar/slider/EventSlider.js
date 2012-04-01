@@ -162,12 +162,11 @@ function EventSlider(calendar, options) {
 		$("#event-allday").click(function() {
 		  currentEvent.allDay = $("#event-allday").attr('checked') ? true : false;
 			configureAllDay(currentEvent.allDay ? true : false);
-			
-			//TODO: set default time when unchecking
 			calendar.rerenderEvents(currentEvent.id);
 		});
 		
 		/* repeating event callback */
+		//TODO - update current event object
 		$("#event-repeat").change(function() {
             if (this.value != 'none') {
                 $("#end-repeat-option").parent().parent().show();
