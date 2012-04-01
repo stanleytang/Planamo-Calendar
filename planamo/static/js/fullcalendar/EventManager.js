@@ -151,11 +151,15 @@ function EventManager(options, _sources) {
 					success: function(events) {
 						events = events || [];
 						
-						//Add highlighted event to cache
-	                    if (prevHighlightedEvent && (!cache[0] || cache[0].id != prevHighlightedEvent.id)) 
+						cache = [];
+						
+						//Add highlighted event to cache 
+						//Assumes beingCreated events are also highlighted
+	                    if (prevHighlightedEvent) 
 	                        cache.push(prevHighlightedEvent);
 						
 						//Remove highlighted event from json source
+						//Assumes theres only one event in the cache
 						if (cache[0]) {
                             for (var i = 0; i < events.length; i++) {
                                 if (events[i].id == cache[0].id) {
