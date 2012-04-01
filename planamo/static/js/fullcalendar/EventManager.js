@@ -153,16 +153,26 @@ function EventManager(options, _sources) {
 						
 						cache = [];
 						
-						//Add highlighted event to cache 
-						//Assumes beingCreated events are also highlighted
+						/* Add highlighted event to cache 
+						Assumes beingCreated events are also highlighted */
 	                    if (prevHighlightedEvent) 
 	                        cache.push(prevHighlightedEvent);
 						
-						//Remove highlighted event from json source
-						//Assumes theres only one event in the cache
+						/* Remove highlighted event from json source
+						Assumes theres only one event in the cache */
 						if (cache[0]) {
                             for (var i = 0; i < events.length; i++) {
                                 if (events[i].id == cache[0].id) {
+                                    //If repeating, check to make sure event has same time
+                                    if (cache[0].repeating) {
+                                        var eventStartDate = parseDate(events[i].start);
+                                        if (eventStartDate.getDate() != cache[0].start.getDate() ||
+                                            eventStartDate.getMonth() != cache[0].start.getDate() ||
+                                            eventStartDate.getFullYear() != cache[0].start.getFullYear())
+                                        {
+                                            continue;
+                                        }
+                                    }
                                     events.splice(i, 1);
                                     break;
                                 }

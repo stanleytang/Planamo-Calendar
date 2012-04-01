@@ -266,7 +266,7 @@ def updateEvent(request):
                         except KeyError:
                             pass
                         alldayKeyExtracted = True
-                    user_timezone = timezone(request.user.get_profile().timezone)
+                    user_timezone = pytz.timezone(request.user.get_profile().timezone)
                     start_date = adjustDateStringToTimeZone(user_timezone=user_timezone, 
                         date_string=obj['start'], allday=event.allday)
                     event.start_date = start_date
@@ -277,7 +277,7 @@ def updateEvent(request):
                         except KeyError:
                             pass
                         alldayKeyExtracted = True
-                    user_timezone = timezone(request.user.get_profile().timezone)
+                    user_timezone = pytz.timezone(request.user.get_profile().timezone)
                     end_date = adjustDateStringToTimeZone(user_timezone=user_timezone, 
                         date_string=obj['end'], allday=event.allday)
                     event.end_date = end_date
