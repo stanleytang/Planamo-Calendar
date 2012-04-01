@@ -6,7 +6,6 @@ from django.utils import simplejson
 from datetime import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
-from pytz import timezone
 import pytz
 
 @login_required
@@ -22,12 +21,27 @@ def index(request):
 @login_required
 def jsonfeed(request):
     """
-    Returns all the events associated with that calendar in JSON
-    TODO - do you return ALL the events every single time? What if
-    the user has tons of events? Maybe only return this months?
+    Returns all the events associated with that calendar in JSON within a
+    specified time interval
     """
-    events = Event.objects.filter(attendance__calendar=request.user.calendar)
+    # Gets URL parameters, which should be in the form of JavaScript Date object
+    # toString() method
+    start_date = request.GET.get('start', '0')
+    end_date = request.GET.get('end', '0')
+    
     data = []
+    if start_date == '0' and end_date == '0':
+        # return an empty data set if start/end params are not specified
+        return HttpResponse(simplejson.dumps(data), mimetype='application/json')
+    
+    user_timezone = pytz.timezone(request.user.get_profile().timezone)
+    start_date = adjustDateStringToTimeZone(user_timezone, start_date)
+    end_date = adjustDateStringToTimeZone(user_timezone, end_date)
+    
+    events = (Event.objects.
+        filter(attendance__calendar=request.user.calendar,
+        end_date__gt=start_date, start_date__lt=end_date))
+        
     for event in events:
         attendance = get_object_or_404(Attendance,
             calendar=request.user.calendar, event=event)
@@ -87,17 +101,17 @@ def createEvent(request):
             allday = get_boolean(allday)
             
             # Get date and adjust timezone offsets
-            user_timezone = timezone(request.user.get_profile().timezone)
+            user_timezone = pytz.timezone(request.user.get_profile().timezone)
             start_date = adjustDateStringToTimeZone(user_timezone=user_timezone, 
                 date_string=obj['start'])
-            start_date = adjustDateStringToTimeZone(user_timezone=user_timezone, 
+            end_date = adjustDateStringToTimeZone(user_timezone=user_timezone, 
                 date_string=obj['end'])
             
             color = obj['color'].lower()
             notes = obj.get('notes', '')              
         except KeyError:
             message = {'success': False}
-            print "Error reading valsues from event json"
+            print "Error reading values from event json"
             return HttpResponse(simplejson.dumps(message),
                 mimetype='application/json')
 
@@ -238,12 +252,14 @@ def updateEvent(request):
                 elif key == 'allDay':
                     event.update(allday=get_boolean(obj['allDay']))
                 elif key == 'start':
-                    user_timezone = timezone(request.user.get_profile().timezone)
+                    user_timezone = \
+                        pytz.timezone(request.user.get_profile().timezone)
                     start_date = adjustDateStringToTimeZone(user_timezone=user_timezone, 
                         date_string=obj['start'])
                     event.update(start_date=start_date)
                 elif key == 'end':
-                    user_timezone = timezone(request.user.get_profile().timezone)
+                    user_timezone = \
+                        pytz.timezone(request.user.get_profile().timezone)
                     end_date = adjustDateStringToTimeZone(user_timezone=user_timezone, 
                         date_string=obj['end'])
                     event.update(end_date=end_date)

@@ -802,47 +802,47 @@ function EventSlider(calendar, options) {
 	 * @param true if cancels created events automatically
 	 * @return true if view is successful, false otherwise
 	 */
-	function viewEvent(event, forceCancel) {
-	  if (currentEvent && event.id == currentEvent.id) return;
-	  
-    if (currentEvent){ 
-      // if currentEvent to view is being created
-      if (currentEvent.beingCreated) {
-        if (!this.clear()) {
-          return this; // exit immediately if user didn't want to cancel event
-        }
-      } else {
-      // if currentEvent was edited but not yet saved
-        if (!cancelEventChanges()) {
-           event.highlight = false;
-           currentEvent.highlight = true;
-           calendar.rerenderEvents(event.id, currentEvent.id);
-           return this;
-        };
-      }
-      currentEvent = event;
-      this.update(event);
-    } else {
-      currentEvent = event;
-      this.triggerSlider(event, forceCancel);
-    }
+     function viewEvent(event, forceCancel) {
+         if (currentEvent && event.id == currentEvent.id) return;
+         if (currentEvent){ 
+             // if currentEvent to view is being created
+             if (currentEvent.beingCreated) {
+                 if (!this.clear()) {
+                     return this; // exit immediately if user didn't want to
+                                  // cancel event
+                 }
+             } else {
+                 // if currentEvent was edited but not yet saved
+                 if (!cancelEventChanges()) {
+                     event.highlight = false;
+                     currentEvent.highlight = true;
+                     calendar.rerenderEvents(event.id, currentEvent.id);
+                     return this;
+                 };
+             }
+             currentEvent = event;
+             this.update(event);
+         } else {
+             currentEvent = event;
+             this.triggerSlider(event, forceCancel);
+         }
 
-    // Make copy of event
-    originalEvent = $.extend({}, currentEvent);
-    originalEvent.start = currentEvent.start.clone();
-    originalEvent.end = currentEvent.end.clone();
+         // Make copy of event
+         originalEvent = $.extend({}, currentEvent);
+         originalEvent.start = currentEvent.start.clone();
+         originalEvent.end = currentEvent.end.clone();
 
-		//Resets size of event input boxes to fit content for new event
-		$("#event-title").data('AutoResizer').check(null, true);
-		$("#event-location").data('AutoResizer').check(null, true);
-		$("#event-notes").data('AutoResizer').check(null, true);
-		
-		//Highlight event
-    if (!calendar.isNewEventBeingCreated()) {
-      calendar.highlightEvent(event);
-    }
-			
-		return this;
+         //Resets size of event input boxes to fit content for new event
+         $("#event-title").data('AutoResizer').check(null, true);
+         $("#event-location").data('AutoResizer').check(null, true);
+         $("#event-notes").data('AutoResizer').check(null, true);
+
+         //Highlight event
+         if (!calendar.isNewEventBeingCreated()) {
+             calendar.highlightEvent(event);
+         }
+
+         return this;
 	}
 	
 	/**
@@ -951,53 +951,53 @@ function EventSlider(calendar, options) {
 	* @return none
 	*/
 	function update(event, rerender) {
-	  if (!event) return this;
-	  
-		if ( currentEvent && 
-		    (currentEvent.id !== null && event.id !== currentEvent.id) ) {
-			// don't update the display if the event isn't on the slider
-			return this;
-		}
-		
-		//show correct title
-		if (event.beingCreated) {
-			if (event.title || event.title === "") {
-			  $('#event-title').val(event.title);
-		  }
-			if (!event.nlp) $('#event-title').focus();
-			  // don't focus if event was created by typing in EventTextbox
-		} else {
-			$('#event-title').val(event.title);
-		}
-		
-		//show correct location
-		$('#event-location').val(event.location);
-			
-		//show correct dates - temps
-		$('#event-allday').prop("checked", event.allDay); 
-		configureAllDay(event.allDay);
-		
-		var $start = slider.find('#event-time-start');
-		var $end   = slider.find('#event-time-finish');
-		$start.val(event.start ? formatDate(event.start, event.allDay) : "");
-		$end.val(event.end ? formatDate(event.end, event.allDay) : "");
-		
-		//show correct notes
-		$('#event-notes').val(event.notes);
-		
-		//TODO: repeat
-		
-		showCorrectColorOptionTicked(event);
-		showCorrectButtons();
-		
-		if(rerender) {
-		  calendar.rerenderEvents(event.id);
-  		calendar.unselect();
-		}
+        if (!event) return this;
 
-    textbox.resetTextbox(); // if slider is updated, make NLP textbox back to empty
-		
-		return this;
+        if ( currentEvent && 
+            (currentEvent.id !== null && event.id !== currentEvent.id) ) {
+                // don't update the display if the event isn't on the slider
+                return this;
+            }
+
+            //show correct title
+            if (event.beingCreated) {
+                if (event.title || event.title === "") {
+                    $('#event-title').val(event.title);
+                }
+                if (!event.nlp) $('#event-title').focus();
+                // don't focus if event was created by typing in EventTextbox
+            } else {
+                $('#event-title').val(event.title);
+            }
+
+            //show correct location
+            $('#event-location').val(event.location);
+
+            //show correct dates - temps
+            $('#event-allday').prop("checked", event.allDay); 
+            configureAllDay(event.allDay);
+
+            var $start = slider.find('#event-time-start');
+            var $end   = slider.find('#event-time-finish');
+            $start.val(event.start ? formatDate(event.start, event.allDay) : "");
+            $end.val(event.end ? formatDate(event.end, event.allDay) : "");
+
+            //show correct notes
+            $('#event-notes').val(event.notes);
+
+            //TODO: repeat
+
+            showCorrectColorOptionTicked(event);
+            showCorrectButtons();
+
+            if(rerender) {
+                calendar.rerenderEvents(event.id);
+                calendar.unselect();
+            }
+
+            textbox.resetTextbox(); // if slider is updated, make NLP textbox back to empty
+
+            return this;
 	}
 	
 	/**
