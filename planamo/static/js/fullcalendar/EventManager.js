@@ -57,7 +57,7 @@ function EventManager(options, _sources) {
 	
 	
 	/* Fetching
-	-----------------------------------------------------------------------------*/
+	--------------------------------------------------------------------------*/
 	
 	
 	function isFetchNeeded(start, end) {
@@ -138,16 +138,37 @@ function EventManager(options, _sources) {
 				var startParam = firstDefined(source.startParam, options.startParam);
 				var endParam = firstDefined(source.endParam, options.endParam);
 				if (startParam) {
-					data[startParam] = Math.round(+rangeStart / 1000);
+					//data[startParam] = Math.round(+rangeStart / 1000);
+					data[startParam] = rangeStart.toString();
 				}
 				if (endParam) {
-					data[endParam] = Math.round(+rangeEnd / 1000);
+					//data[endParam] = Math.round(+rangeEnd / 1000);
+					data[endParam] = rangeEnd.toString();
 				}
 				pushLoading();
 				$.ajax($.extend({}, ajaxDefaults, source, {
 					data: data,
 					success: function(events) {
+					    // Clear the cache, but figure out if any of the cached
+					    // events were highlighted, and highlight the respective
+					    // event from the jsonfeed
+					    for (var cachedEvent in cache) {
+					        if (cachedEvent.highlighted) {
+					            var highlightedID = cachedEvent.id;
+					            break;
+					        }
+					    }
+					    cache = [];
 						events = events || [];
+						if (highlightedID) {
+						    for (var event in events) {
+						        if (highlightedID = event.id) {
+						            event.highlighted = true;
+						            break;
+						        }
+						    }
+						}
+						
 						var res = applyAll(success, this, arguments);
 						if ($.isArray(res)) {
 							events = res;
