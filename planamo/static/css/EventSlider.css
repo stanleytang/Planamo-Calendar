@@ -123,6 +123,11 @@
 		/* border: 1px solid red; */
 	}
 	
+	#event-slider-container #event-end-repeat-date {
+	    margin-left: 7px;
+	    width: 87px;
+	}
+	
 	/* Event attendees box */
 	
 	#event-attendees-box {

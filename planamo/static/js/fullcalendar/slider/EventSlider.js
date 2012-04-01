@@ -167,6 +167,27 @@ function EventSlider(calendar, options) {
 			calendar.rerenderEvents(currentEvent.id);
 		});
 		
+		/* repeating event callback */
+		$("#event-repeat").change(function() {
+            if (this.value != 'none') {
+                $("#end-repeat-option").parent().parent().show();
+                if ($("#end-repeat-option").val() == 'never') {
+                    $("#event-end-repeat-date").hide();
+                } else {
+                    $("#event-end-repeat-date").show();
+                }
+            } else {
+                $("#end-repeat-option").parent().parent().hide();
+            }
+        });
+		$("#end-repeat-option").change(function() {
+            if (this.value == 'never') {
+                $("#event-end-repeat-date").hide();
+            } else {
+                $("#event-end-repeat-date").show();
+            }
+        });
+		
 		/* event color selection callback */
 		$('.event-color').click(function() {
 			$(".event-color").removeClass('event-color-selected');
@@ -202,7 +223,7 @@ function EventSlider(calendar, options) {
 			if (calendar.isNewEventBeingCreated()) {
 				$('#cancel-event-button').click();	
 			} else {
-			  cancelEventChanges();
+			    cancelEventChanges();
 			}
 		});
 		eventHeader.append(closeSliderButton);
@@ -219,17 +240,18 @@ function EventSlider(calendar, options) {
 	 */
 	function renderEventContent() {
 		var eventContent = $("<div id='event-content' />");
-		var eventDetailsList = ["location", "all day", "from", "to", "repeat", "notes", "color"];
+		var eventDetailsList = ["location", "all day", "from", "to", "repeat", 
+		                            "end", "notes", "color"];
 				
 		var eventDetailTable = $("<table width='100%' cellpadding='4' cellspacing='0' />");
 		for (eventDetailIndex in eventDetailsList) {
 			var eventDetailName = eventDetailsList[eventDetailIndex];
-			eventDetailTable.append(
-			"<tr>" +
-		    "<td class='detail-name'>" + eventDetailName + ":</td>" +
-		    "<td class='detail-input'>" + renderEventDetailInput(eventDetailName) + "</td>" +
+		    eventDetailTable.append(
+		    "<tr>" +
+		        "<td class='detail-name'>" + eventDetailName + ":</td>" +
+		        "<td class='detail-input'>" + renderEventDetailInput(eventDetailName) + "</td>" +
 		    "</tr>"
-			);
+		    );
 		}
 		
 		eventDetailTable.children().children()
@@ -258,8 +280,21 @@ function EventSlider(calendar, options) {
 		if (detailInput == "location" || detailInput == "notes") {
 			eventDetailInput = "<textarea type='text' id='event-" + detailInput + 
 			"' class='event-editable' placeholder='" + detailInput + "' />";
-		} else if (detailInput == "repeat"){
-            eventDetailInput = "<span id='event-repeat'>repeat - to be built</span>"; //temp
+		} else if (detailInput == "repeat") {
+			eventDetailInput = "<select id='event-repeat'>" +
+			                        "<option value='none'>None</option>" +
+			                        "<option value='every-day'>Every day</option>" +
+			                        "<option value='every-week'>Every week</option>" +
+			                        "<option value='every-month'>Every month</option>" +
+			                        "<option value='every-year'>Every year</option>" +
+			                    "</select>";  
+		} else if (detailInput == "end")	{
+		    eventDetailInput = "<select id='end-repeat-option'>" +
+ 			                        "<option value='never'>Never</option>" +
+ 			                        "<option value='on-date'>On date</option>" +
+ 			                    "</select>" + 
+ 			                    "<input id='event-end-repeat-date' class='event-editable' value='fake date' />";    
+ 			                        //TODO - repeating end date
 		} else if (detailInput == "all day") {
 			eventDetailInput = "<input type='checkbox' id='event-allday' value='allday'/>";
 		} else if (detailInput == "from") {
@@ -286,7 +321,7 @@ function EventSlider(calendar, options) {
 	function renderEventAttendeesBox() {
 		var box = $("<div id='event-attendees-box' />");
 		
-		//TODO - temp
+		//TODO - fix up box
 		box.append(
 			"<img src='/mymedia/images/andypic.jpg' width='45' height='45'>" + 
 			"<br>&nbsp;&nbsp;Andy");
@@ -984,7 +1019,7 @@ function EventSlider(calendar, options) {
         //show correct location
         $('#event-location').val(event.location);
 
-        //show correct dates - temps
+        //show correct dates
         $('#event-allday').prop("checked", event.allDay); 
         configureAllDay(event.allDay);
 
@@ -996,7 +1031,21 @@ function EventSlider(calendar, options) {
         //show correct notes
         $('#event-notes').val(event.notes);
 
-        //TODO: repeat
+        //show correct repeating event details
+        if (event.repeating) {
+            if (event.repeating == 1) $("#event-repeat").val('every-day');
+            if (event.repeating == 2) $("#event-repeat").val('every-week');
+            if (event.repeating == 3) $("#event-repeat").val('every-month');
+            if (event.repeating == 4) $("#event-repeat").val('every-year'); 
+           
+           //TODO - implement repeating option (never or end date)
+            $("#end-repeat-option").parent().parent().show();
+            $("#end-repeat-option").val('never');
+            $("#event-end-repeat-date").hide();
+        } else {
+            $("#event-repeat").val('none');
+            $("#end-repeat-option").parent().parent().hide();
+        }
 
         showCorrectColorOptionTicked(event);
         showCorrectButtons();
