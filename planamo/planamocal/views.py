@@ -216,7 +216,7 @@ def updateEvent(request):
                 
         # Get event
         try:
-            event = Event.objects.filter(id=eventID)
+            event = Event.objects.get(id=eventID)
         except ObjectDoesNotExist:
             message = {'success': False}
             print "Event doesn't exist in database"
@@ -225,7 +225,7 @@ def updateEvent(request):
         
         # Get attendance
         try: 
-            attendance = Attendance.objects.filter(calendar=calendar, event=event)
+            attendance = Attendance.objects.get(calendar=calendar, event=event)
         except ObjectDoesNotExist:
             message = {'success': False}
             print "Event doesn't exist in database"
@@ -234,29 +234,43 @@ def updateEvent(request):
 
         # Update event from request object values
         try:
+            alldayKeyExtracted = False
             for key in obj:
                 if key == 'eventID': 
                     pass
                 elif key == 'title':
-                    event.update(title=obj['title'])
+                    event.title = obj['title']
                 elif key == 'location':
-                    event.update(location=obj.get('location', ''))
-                elif key == 'allDay':
-                    event.update(allday=get_boolean(obj['allDay']))
+                    event.location = obj.get('location', '')
+                elif key == 'allDay' and not alldayKeyExtracted:
+                    event.allday = get_boolean(obj['allDay'])
+                    alldayKeyExtracted = True
                 elif key == 'start':
+                    if not alldayKeyExtracted:
+                        try:
+                            event.allday = get_boolean(obj['allDay'])
+                        except KeyError:
+                            pass
+                        alldayKeyExtracted = True
                     user_timezone = timezone(request.user.get_profile().timezone)
                     start_date = adjustDateStringToTimeZone(user_timezone=user_timezone, 
                         date_string=obj['start'], allday=event.allday)
-                    event.update(start_date=start_date)
+                    event.start_date = start_date
                 elif key == 'end':
+                    if not alldayKeyExtracted:
+                        try:
+                            event.allday = get_boolean(obj['allDay'])
+                        except KeyError:
+                            pass
+                        alldayKeyExtracted = True
                     user_timezone = timezone(request.user.get_profile().timezone)
                     end_date = adjustDateStringToTimeZone(user_timezone=user_timezone, 
                         date_string=obj['end'], allday=event.allday)
-                    event.update(end_date=end_date)
+                    event.end_date = end_date
                 elif key == 'color':
-                    attendance.update(color=obj['color'].lower())
+                    attendance.color = obj['color'].lower()
                 elif key == 'notes':
-                    attendance.update(notes=obj['notes'])
+                    attendance.notes = obj['notes']
                 else:
                     pass
         except KeyError:
@@ -264,6 +278,11 @@ def updateEvent(request):
             print "Error reading values from event json"
             return HttpResponse(simplejson.dumps(message),
                 mimetype='application/json')
+                
+        #Save
+        event.save()
+        attendance.save()
+        
         message = {'success': True}    
     else:
         message = {'success': False}

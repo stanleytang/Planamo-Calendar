@@ -123,8 +123,8 @@ function updateEventTimeToServer(event) {
 		var y = date.getFullYear();
 
 		/* Intialize calendar */
-    var eventTitle = null;
-    var newEvent;
+        var eventTitle = null;
+        var newEvent;
 		var calendar = $('#calendar').fullCalendar({
 			theme: true,
 			header: {
@@ -169,18 +169,18 @@ function updateEventTimeToServer(event) {
 			  if (calendar.fullCalendar('isNewEventBeingCreated') &&  
 			      calendar.fullCalendar('isNewEventBeingCreated').id == event.id)
 			    return;
-			  // TODO deal with repeating event
+			    // TODO deal with repeating event
 				slider.viewEvent(event);
 			},
 			eventResize: function(event) {
-			  slider.update(event);
+			    slider.update(event);
 			
 				if (!slider.extended) {
 					updateEventTimeToServer(event);
 				}
 			},
 			eventDrop: function(event) {
-			  slider.update(event);
+			    slider.update(event);
 			
 				if (!slider.extended) {
 					updateEventTimeToServer(event);

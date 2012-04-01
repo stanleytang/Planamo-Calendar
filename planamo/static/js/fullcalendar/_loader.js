@@ -45,8 +45,8 @@ js('common/CoordinateGrid.js');
 js('common/HoverListener.js');
 js('common/HorizontalPositionCache.js');
 
-js('sidebar/EventSlider.js');
-js('sidebar/EventTextBox.js');
+js('slider/EventSlider.js');
+js('slider/EventTextBox.js');
 
 
 endload();
