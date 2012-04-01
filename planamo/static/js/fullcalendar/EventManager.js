@@ -152,18 +152,12 @@ function EventManager(options, _sources) {
 					    // Clear the cache, but figure out if any of the cached
 					    // events were highlighted, and highlight the respective
 					    // event from the jsonfeed
-					    for (var cachedEvent in cache) {
-					        if (cachedEvent.highlighted) {
-					            var highlightedID = cachedEvent.id;
-					            break;
-					        }
-					    }
 					    cache = [];
 						events = events || [];
-						if (highlightedID) {
-						    for (var event in events) {
-						        if (highlightedID = event.id) {
-						            event.highlighted = true;
+						if (prevHighlightedEvent) {
+						    for (var i = 0; i < events.length; i++) {
+						        if (prevHighlightedEvent.id == events[i].id) {
+						            events[i].highlight = true;
 						            break;
 						        }
 						    }
