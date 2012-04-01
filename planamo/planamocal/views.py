@@ -64,20 +64,26 @@ def get_boolean(value):
         value = False
     return value
     
-def adjustDateStringToTimeZone(user_timezone, date_string):
+def adjustDateStringToTimeZone(user_timezone, date_string, allday):
     """
     HELPER FUNCTION
     Converts a date string into a datetime object with adjusted timezone
-    to UTC time and seconds to zero
+    to UTC time and seconds to zero.
+    
+    All-Day Events Exception: if event is allday, treat as UTC (do not convert)
     """
     date_offset_index = date_string.find('-')
     date_string = (date_string[:date_offset_index] if
         (date_offset_index != -1) else date_string)
     date = datetime.strptime(date_string, 
         "%a %b %d %Y %H:%M:%S %Z")
+    if allday:
+        utc = pytz.UTC
+        date = utc.localize(date)
+    if not allday:
+        date = user_timezone.localize(date)
+        date = date.astimezone(pytz.utc)
     date = date.replace(second=0) # TODO - temp hack
-    date = user_timezone.localize(date)
-    date = date.astimezone(pytz.utc)
     return date
 
 @login_required
@@ -103,9 +109,9 @@ def createEvent(request):
             # Get date and adjust timezone offsets
             user_timezone = pytz.timezone(request.user.get_profile().timezone)
             start_date = adjustDateStringToTimeZone(user_timezone=user_timezone, 
-                date_string=obj['start'])
+                date_string=obj['start'], allday=allday)
             end_date = adjustDateStringToTimeZone(user_timezone=user_timezone, 
-                date_string=obj['end'])
+                date_string=obj['end'], allday=allday)
             
             color = obj['color'].lower()
             notes = obj.get('notes', '')              
@@ -255,13 +261,13 @@ def updateEvent(request):
                     user_timezone = \
                         pytz.timezone(request.user.get_profile().timezone)
                     start_date = adjustDateStringToTimeZone(user_timezone=user_timezone, 
-                        date_string=obj['start'])
+                        date_string=obj['start'], allday=event.allday)
                     event.update(start_date=start_date)
                 elif key == 'end':
                     user_timezone = \
                         pytz.timezone(request.user.get_profile().timezone)
                     end_date = adjustDateStringToTimeZone(user_timezone=user_timezone, 
-                        date_string=obj['end'])
+                        date_string=obj['end'], allday=event.allday)
                     event.update(end_date=end_date)
                 elif key == 'color':
                     attendance.update(color=obj['color'].lower())
