@@ -1,5 +1,5 @@
 from django.shortcuts import render_to_response, get_object_or_404
-from planamocal.models import Calendar, Event, Attendance
+from planamocal.models import Calendar, Event, Attendance, RepeatingEvent
 from django.http import HttpResponse, Http404
 from django.template import RequestContext
 from django.utils import simplejson
@@ -272,16 +272,49 @@ def createEvent(request):
                 date_string=obj['end'], allday=allday)
             
             color = obj['color'].lower()
-            notes = obj.get('notes', '')              
+            notes = obj.get('notes', '')
         except KeyError:
             message = {'success': False}
             print "Error reading values from event json"
             return HttpResponse(simplejson.dumps(message),
                 mimetype='application/json')
+                
+        # Get repeating details
+        try:
+            repeating = obj['repeating']
+        except KeyError:
+            repeating = False
+        if repeating:
+            try:
+                repeatStartDate = adjustDateStringToTimeZone(user_timezone=user_timezone, 
+                    date_string=obj['repeatStartDate'], allday=allday)
+                repeatEndDateRaw = obj['repeatEndDate']
+                if repeatEndDateRaw == "0":
+                    repeatEndDate = None
+                else:
+                    repeatEndDate = adjustDateStringToTimeZone(user_timezone=user_timezone, 
+                        date_string=obj['repeatEndDate'], allday=allday)
+            except KeyError:
+                message = {'success': False}
+                print "Error reading start and end dates of repeating event from JSON"
+                return HttpResponse(simplejson.dumps(message),
+                    mimetype='application/json')
 
         # Save event
-        newEvent = Event(title=title, location=location, allday=allday,
-            start_date=start_date, end_date=end_date)
+        if repeating:
+            newEvent = RepeatingEvent(title=title, location=location, 
+                allday=allday, repeating=True, start_date=repeatStartDate, 
+                end_date=repeatEndDate, repeat_interval=repeating)
+            if repeating == 3 or repeating == 4:
+                newEvent.instance_day_of_month = start_date.day
+                if repeating == 4:
+                    newEvent.instance_month = start_date.month
+            # TODO - all day events that span 2 days or more
+            newEvent.instance_start_time = start_date.time()
+            newEvent.instance_end_time = end_date.time()                  
+        else:
+            newEvent = Event(title=title, location=location, allday=allday,
+                start_date=start_date, end_date=end_date)
         newEvent.save()
 
         # Create attendance (map event to calendar)
