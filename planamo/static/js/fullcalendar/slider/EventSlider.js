@@ -675,6 +675,8 @@ function EventSlider(calendar, options) {
 		            $('#event-end-repeat-date').val(formatDate(endDate, true));
 		            $("#event-end-repeat-date").datetimepicker("setDate", endDate);
 		        }
+		        endDate.setHours(23);
+		        endDate.setMinutes(59);
 		        currentEvent.repeatEndDate = endDate;
 		    },
 		    showTimepicker: false
@@ -844,10 +846,16 @@ function EventSlider(calendar, options) {
                            else if (name == "end") updatedEvent.end = currentEvent.end.toString();
                        }
                    } else if (name == "repeatStartDate" || name == "repeatEndDate") {
-                       if (!originalEvent[name] || currentEvent[name].toDateString() != originalEvent[name].toDateString()) {
-                           if (name == "repeatStartDate") updatedEvent.repeatStartDate = currentEvent.repeatStartDate.toString();
-                           else if (name == "repeatEndDate") updatedEvent.repeatEndDate = currentEvent.repeatEndDate.toString(); 
-                       }
+                       //If one of the repeat end dates is 0
+                        if (originalEvent[name] === 0 || currentEvent[name] === 0) {
+                            if (originalEvent[name] != currentEvent[name]) {
+                                updatedEvent[name] = currentEvent[name];
+                            }
+                        //If one of the repeat end dates is valid
+                        } else if (!originalEvent[name] || currentEvent[name].toDateString() != originalEvent[name].toDateString()) {
+                            if (name == "repeatStartDate") updatedEvent.repeatStartDate = currentEvent.repeatStartDate.toString();
+                            else if (name == "repeatEndDate") updatedEvent.repeatEndDate = currentEvent.repeatEndDate.toString(); 
+                        }
                    } else if (currentEvent[name] != originalEvent[name]) {
                        if (name == "allday") updatedEvent.allday = currentEvent.allDay ? true : false;
                        else if (name == "color") updatedEvent.color = rgb2hex(currentEvent.color);
@@ -1090,6 +1098,14 @@ function EventSlider(calendar, options) {
             if (event.repeating == 2) $("#event-repeat").val('every-week');
             if (event.repeating == 3) $("#event-repeat").val('every-month');
             if (event.repeating == 4) $("#event-repeat").val('every-year'); 
+            
+            //Convert date strings into date objects
+            if (typeof(event.repeatStartDate)=='string') {
+                event.repeatStartDate = new Date(event.repeatStartDate);
+            }
+            if (typeof(event.repeatEndDate)=='string') {
+                event.repeatEndDate = new Date(event.repeatEndDate);
+            }
            
             $("#end-repeat-option").parent().parent().show();
             if (event.repeatEndDate) {
