@@ -53,8 +53,9 @@ class Event(models.Model):
     
     # In regular mode, indicates start and end time of event
     # In repeating mode, indicates start and end date of repeating interval
-    start_date = models.DateTimeField() 
-    end_date = models.DateTimeField(null=True)
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField(null=True) # null only for repeating event
+                                               # that never ends
     
     # objects = EventManager()
     
@@ -99,13 +100,14 @@ class RepeatingEvent(Event):
     instance_start_time = models.TimeField() # stored in user's timezone
     instance_end_time = models.TimeField()   # stored in user's timezone
     
+    # TODO implement save method that guarantees event.repeating = True
+    
     
 class RepeatingEventException(models.Model):
     root_event = models.ForeignKey(RepeatingEvent, related_name='exception_set')
     supposed_start_date = models.DateTimeField()
     exception_event = models.OneToOneField(Event, null=True)
         # null if event exception was a delete
-    
     
         
 class Calendar(models.Model):
