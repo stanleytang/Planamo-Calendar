@@ -63,10 +63,34 @@ def jsonfeed(request):
                 json_repeating_events_fixed(start_date=start_date,
                     end_date=end_date,event=event, user=request.user, data=data)
             elif interval == 3: # monthly repeat
-                pass
+                json_repeating_events_notfixed(start_date=start_date,
+                    end_date=end_date,event=event, user=request.user, data=data)
             elif interval == 4: # yearly repeat
-                pass
+                json_repeating_events_notfixed(start_date=start_date,
+                    end_date=end_date,event=event, user=request.user, data=data)
     return HttpResponse(simplejson.dumps(data), mimetype='application/json')
+
+def append_repeating_json(data, event, user, interval, timestamp):
+    """
+    HELPER FUNCTION
+    This function appends an event JSON object to the given JSON data list
+    """
+    repeating_event = event.repeatingevent
+    user_timezone = pytz.timezone(user.get_profile().timezone)
+    length = get_seconds_from_time(repeating_event.
+        instance_end_time) - get_seconds_from_time(repeating_event.
+        instance_start_time)
+    json_object = event.json(user)
+    json_object['repeatStartDate'] = json_object['start']
+    json_object['repeatEndDate'] = json_object['end']
+    json_object['start'] = (datetime.
+        fromtimestamp(timestamp, pytz.utc).
+        astimezone(user_timezone).isoformat())
+    json_object['end'] = (datetime.
+        fromtimestamp(timestamp+length, pytz.utc).
+        astimezone(user_timezone).isoformat())
+    json_object['repeating'] = interval
+    data.append(json_object)
 
 def json_repeating_events_fixed(**kwarg):
     """
@@ -103,9 +127,6 @@ def json_repeating_events_fixed(**kwarg):
     
     # add event JSON objects to data until the end timestamp
     # (end of rendering, or repeating [whichever comes first])
-    event_length = get_seconds_from_time(repeating_event.
-        instance_end_time) - get_seconds_from_time(repeating_event.
-        instance_start_time)
     end_ts = min(event_end_ts, request_end_ts)
     exceptions = repeating_event.exception_set.all()
     exceptions_ts = []
@@ -117,20 +138,69 @@ def json_repeating_events_fixed(**kwarg):
         if rendered_event_ts in exceptions_ts:
             rendered_event_ts += FIXED_INTERVAL
             continue
-        
-        json_object = event.json(user)
-        json_object['repeatStartDate'] = json_object['start']
-        json_object['repeatEndDate'] = json_object['end']
-        json_object['start'] = (datetime.
-            fromtimestamp(rendered_event_ts, pytz.utc).
-            astimezone(user_timezone).isoformat())
-        json_object['end'] = (datetime.
-            fromtimestamp(rendered_event_ts+event_length, pytz.utc).
-            astimezone(user_timezone).isoformat())
-        json_object['repeating'] = interval
-        data.append(json_object)
-        
+    
+        append_repeating_json(data, event, user, interval, rendered_event_ts)    
         rendered_event_ts += FIXED_INTERVAL
+        
+def json_repeating_events_notfixed(**kwarg):
+    """
+    Function used to create event JSON objects for repeating event whose repeat
+    interval is not fixed (e.g. monthly, yearly)
+    """
+    event = kwarg['event']
+    user = kwarg['user']
+    data = kwarg['data']
+    start_date = kwarg['start_date']
+    end_date = kwarg['end_date']
+    
+    user_timezone = pytz.timezone(user.get_profile().timezone)
+    repeating_event = event.repeatingevent
+    interval = repeating_event.repeat_interval
+
+    event_start = event.start_date.astimezone(user_timezone)
+    year = event_start.year
+    month = event_start.month
+    day = event_start.day
+    hour = event_start.hour
+    minute = event_start.minute
+    
+    end = min(event.end_date, end_date)
+    end = end.astimezone(user_timezone)
+    rendered_event_datetime = event.start_date
+    
+    while rendered_event_datetime < start_date:
+        if interval == 3:
+            month += 1
+            if month > 12:
+                month = 1
+                year += 1
+        elif interval == 4:
+            year += 1
+        try:
+            attempt = datetime(year, month, day, hour, 
+                minute, 0, 0, user_timezone)
+        except TypeError:
+            continue
+        rendered_event_datetime = attempt
+    
+    while rendered_event_datetime <= end:
+        try:
+            attempt = datetime(year, month, day, hour, 
+                minute, 0, 0, user_timezone)
+        except TypeError:
+            continue
+        if attempt > end:
+            break
+        rendered_event_datetime = attempt
+        append_repeating_json(data, event, user, interval,
+            calendar.timegm(rendered_event_datetime.utctimetuple()))
+        if interval == 3:
+            month += 1
+            if month > 12:
+                month = 1
+                year += 1
+        elif interval == 4:
+            year += 1
 
 def get_seconds_from_time(time):
     """
