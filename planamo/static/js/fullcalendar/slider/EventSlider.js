@@ -198,7 +198,8 @@ function EventSlider(calendar, options) {
             } else {
                 $("#event-end-repeat-date").show();
                 if (!currentEvent.repeatEndDate) {
-                    $('#event-end-repeat-date').val(formatDate(currentEvent.end, true));
+                    $('#event-end-repeat-date').
+                        val(formatDate(currentEvent.end, true));
                     currentEvent.repeatEndDate = currentEvent.end;
                 } else {
                     $('#event-end-repeat-date').val(formatDate(currentEvent.repeatEndDate, true));
