@@ -97,12 +97,8 @@ class RepeatingEvent(Event):
     )
     
     repeat_interval = models.IntegerField(choices=REPEAT_CHOICES)
-    instance_day_of_month = models.PositiveIntegerField(default=0)
-        # only used with yearly/monthly (0 for other repeat options)
-    instance_month = models.PositiveIntegerField(default=0)
-        # only used with yearly (0 for other options)
     instance_start_time = models.TimeField() # stored in user's timezone
-    instance_end_time = models.TimeField()   # stored in user's timezone
+    instance_length_in_min = models.PositiveIntegerField()
     
     # TODO implement save method that guarantees event.repeating = True
     

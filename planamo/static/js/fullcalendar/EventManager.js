@@ -135,7 +135,8 @@ function EventManager(options, _sources) {
 				var error = source.error;
 				var complete = source.complete;
 				var data = $.extend({}, source.data || {});
-				var startParam = firstDefined(source.startParam, options.startParam);
+				var startParam = firstDefined(source.startParam,
+				    options.startParam);
 				var endParam = firstDefined(source.endParam, options.endParam);
 				if (startParam) {
 					//data[startParam] = Math.round(+rangeStart / 1000);
@@ -163,9 +164,11 @@ function EventManager(options, _sources) {
 						if (cache[0]) {
                             for (var i = 0; i < events.length; i++) {
                                 if (events[i].id == cache[0].id) {
-                                    //If repeating, check to make sure event has same time
+                                    // If repeating, check to make sure event
+                                    // has same time
                                     if (cache[0].repeating) {
-                                        var eventStartDate = parseDate(events[i].start);
+                                        var eventStartDate =
+                                            parseDate(events[i].start);
                                         if (eventStartDate.getDate() != cache[0].start.getDate() ||
                                             eventStartDate.getMonth() != cache[0].start.getDate() ||
                                             eventStartDate.getFullYear() != cache[0].start.getFullYear())
@@ -244,7 +247,7 @@ function EventManager(options, _sources) {
 	
 	
 	/* Manipulation
-	-----------------------------------------------------------------------------*/
+	--------------------------------------------------------------------------*/
 	
 	
 	function updateEvent(event) { // update an existing event
@@ -265,7 +268,7 @@ function EventManager(options, _sources) {
 						e.end = new Date(+defaultEventEnd(e) + endDelta);
 					}
 				}else{
-					e.end = null;
+					e.end = null; // TODO set e.end to 1 hour ahead of startDate
 				}
 				e.title = event.title;
 				e.url = event.url;
@@ -285,7 +288,7 @@ function EventManager(options, _sources) {
 	
 	
 	function renderEvent(event, stick) {
-	//	var out = normalizeEvent(event); // return normalized event
+		var out = normalizeEvent(event); // return normalized event
 		if (!event.source) {
 			if (stick) {
 				stickySource.events.push(event);

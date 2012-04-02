@@ -82,7 +82,7 @@ function View(element, calendar, viewName) {
 	
 	
 	/* Event Data
-	------------------------------------------------------------------------------*/
+	--------------------------------------------------------------------------*/
 	
 	
 	// report when view receives new events
@@ -108,7 +108,7 @@ function View(element, calendar, viewName) {
 	
 	
 	/* Event Elements
-	------------------------------------------------------------------------------*/
+	--------------------------------------------------------------------------*/
 	
 	
 	// report when view creates an element for an event

@@ -139,9 +139,12 @@ function EventSlider(calendar, options) {
 		/* event editable box input callbacks */
 		$(".event-editable").blur(function() {
 		 	if (currentEvent) {
-				if ($(this).is('#event-title'))	currentEvent.title = $(this).val();
-				if ($(this).is('#event-location')) currentEvent.location = $(this).val();
-				if ($(this).is('#event-notes'))	currentEvent.notes = $(this).val();
+				if ($(this).is('#event-title'))
+				    currentEvent.title = $(this).val();
+				if ($(this).is('#event-location'))
+				    currentEvent.location = $(this).val();
+				if ($(this).is('#event-notes'))
+				    currentEvent.notes = $(this).val();
 				if ($(this).is('#event-time-start')) {
 			  	    setStartDate($(this).val());
 			    } else {
@@ -160,22 +163,26 @@ function EventSlider(calendar, options) {
 		
 		/* checkbox allday callback */
 		$("#event-allday").click(function() {
-		    currentEvent.allDay = $("#event-allday").attr('checked') ? true : false;
+		    currentEvent.allDay = $("#event-allday").attr('checked') ?
+		        true : false;
 		    configureAllDay(currentEvent.allDay ? true : false);
 			calendar.rerenderEvents(currentEvent.id);
 		});
 		
 		/* repeating event callback */
 		$("#event-repeat").change(function() {
-            if (this.value != 'none') {
+            if (this.value != 'none' && currentEvent.beingCreated) {
                 //TODO - update repeating event rendering
                 if (this.value == 'every-day') currentEvent.repeating = 1;
                 else if (this.value == 'every-week') currentEvent.repeating = 2;
-                else if (this.value == 'every-month') currentEvent.repeating = 3;
+                else if (this.value == 'every-month')
+                    currentEvent.repeating = 3;
                 else currentEvent.repeating = 4; //defaults to every-year 
 
-                if (!currentEvent.repeatStartDate) currentEvent.repeatStartDate = currentEvent.start;
-                if (!currentEvent.repeatEndDate) $("#end-repeat-option").val('never');
+                if (!currentEvent.repeatStartDate)
+                    currentEvent.repeatStartDate = currentEvent.start;
+                if (!currentEvent.repeatEndDate) 
+                    $("#end-repeat-option").val('never');
                 updateEventEndRepeatOptions();
                 $("#end-repeat-option").parent().parent().show();
             } else {
@@ -574,9 +581,22 @@ function EventSlider(calendar, options) {
 	     showCorrectButtons();
 	     
 	     // Make copy of event
-	     originalEvent = $.extend({}, currentEvent);
-	     originalEvent.start = currentEvent.start.clone();
-	     originalEvent.end = currentEvent.end.clone();
+	     originalEvent = cloneEvent(currentEvent);
+	 }
+	 
+	 /**
+	  * Function: cloneEvent
+	  * --------------------
+	  * Clones an event
+	  * @param event to clone
+	  * @return cloned event
+	  */
+	 function cloneEvent(event) {
+	     var clone = $.extend({}, event);
+	     clone.start = event.start.clone();
+	     clone.end = event.end.clone();
+	     
+	     return clone;
 	 }
 	
 	
@@ -935,9 +955,7 @@ function EventSlider(calendar, options) {
         }
 
         // Make copy of event
-        originalEvent = $.extend({}, currentEvent);
-        originalEvent.start = currentEvent.start.clone();
-        originalEvent.end = currentEvent.end.clone();
+        originalEvent = cloneEvent(currentEvent);
 
         //Resets size of event input boxes to fit content for new event
         $("#event-title").data('AutoResizer').check(null, true);

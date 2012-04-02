@@ -81,9 +81,7 @@ def append_repeating_json(data, event, attendance, user, interval, timestamp):
     """
     repeating_event = event.repeatingevent
     user_timezone = pytz.timezone(user.get_profile().timezone)
-    length = get_seconds_from_time(repeating_event.
-        instance_end_time) - get_seconds_from_time(repeating_event.
-        instance_start_time)
+    length = repeating_event.instance_length_in_min * 60
     json_object = event.json(user)
     json_object['repeatStartDate'] = json_object['start']
     json_object['repeatEndDate'] = json_object['end']
@@ -326,7 +324,8 @@ def createEvent(request):
                     newEvent.instance_month = start_date.month
             # TODO - all day events that span 2 days or more
             newEvent.instance_start_time = start_date.time()
-            newEvent.instance_end_time = end_date.time()                  
+            newEvent.instance_length_in_min = (get_seconds_from_time(
+                end_date.time()) - get_seconds_from_time(start_date.time()))/60                  
         else:
             newEvent = Event(title=title, location=location, allday=allday,
                 start_date=start_date, end_date=end_date)
