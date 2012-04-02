@@ -455,8 +455,10 @@ function EventManager(options, _sources) {
 	function normalizeEvent(event) {
 		var source = event.source || {};
 		var ignoreTimezone = firstDefined(source.ignoreTimezone, options.ignoreTimezone);
-		event._id = event._id || (event.id === undefined ? eventGUID++ : event.id);
-		event.id = event._id;
+		//event._id = event._id || (event.id === undefined ? eventGUID++ : event.id);
+		//event.id = event._id;
+		if (!event.id) event.id = event._id = -1; //new events get ID -1 - guarantee no conflicts
+		if (!event._id) event._id = event.id;
 
 		if (event.date) {
 			if (!event.start) {

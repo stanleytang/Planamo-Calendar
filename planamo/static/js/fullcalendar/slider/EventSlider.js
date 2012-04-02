@@ -160,32 +160,51 @@ function EventSlider(calendar, options) {
 		
 		/* checkbox allday callback */
 		$("#event-allday").click(function() {
-		  currentEvent.allDay = $("#event-allday").attr('checked') ? true : false;
-			configureAllDay(currentEvent.allDay ? true : false);
+		    currentEvent.allDay = $("#event-allday").attr('checked') ? true : false;
+		    configureAllDay(currentEvent.allDay ? true : false);
 			calendar.rerenderEvents(currentEvent.id);
 		});
 		
 		/* repeating event callback */
-		//TODO - update current event object
 		$("#event-repeat").change(function() {
             if (this.value != 'none') {
+                //TODO - update repeating event rendering
+                if (this.value == 'every-day') currentEvent.repeating = 1;
+                else if (this.value == 'every-week') currentEvent.repeating = 2;
+                else if (this.value == 'every-month') currentEvent.repeating = 3;
+                else currentEvent.repeating = 4; //defaults to every-year 
+
+                if (!currentEvent.repeatStartDate) currentEvent.repeatStartDate = currentEvent.start;
+                if (!currentEvent.repeatEndDate) $("#end-repeat-option").val('never');
+                updateEventEndRepeatOptions();
                 $("#end-repeat-option").parent().parent().show();
-                if ($("#end-repeat-option").val() == 'never') {
-                    $("#event-end-repeat-date").hide();
-                } else {
-                    $("#event-end-repeat-date").show();
-                }
             } else {
+                currentEvent.repeating = 0;
+                currentEvent.repeatStartDate = null;
+                currentEvent.repeatEndDate = null;
                 $("#end-repeat-option").parent().parent().hide();
             }
         });
+        //TODO - update repeating event re-rendering
 		$("#end-repeat-option").change(function() {
-            if (this.value == 'never') {
+            updateEventEndRepeatOptions()
+        });
+        
+        /* HELPER FUNCTION: Updates the end date options for repeating events */
+        function updateEventEndRepeatOptions() {
+            if ($("#end-repeat-option").val() == 'never') {
                 $("#event-end-repeat-date").hide();
+                currentEvent.repeatEndDate = 0;
             } else {
                 $("#event-end-repeat-date").show();
+                if (!currentEvent.repeatEndDate) {
+                    $('#event-end-repeat-date').val(formatDate(currentEvent.end, true));
+                    currentEvent.repeatEndDate = currentEvent.end;
+                } else {
+                    $('#event-end-repeat-date').val(formatDate(currentEvent.repeatEndDate, true));
+                }
             }
-        });
+        }
 		
 		/* event color selection callback */
 		$('.event-color').click(function() {
@@ -292,8 +311,7 @@ function EventSlider(calendar, options) {
  			                        "<option value='never'>Never</option>" +
  			                        "<option value='on-date'>On date</option>" +
  			                    "</select>" + 
- 			                    "<input id='event-end-repeat-date' class='event-editable' value='fake date' />";    
- 			                        //TODO - repeating end date
+ 			                    "<input id='event-end-repeat-date' class='event-editable' value='fake date' />";
 		} else if (detailInput == "all day") {
 			eventDetailInput = "<input type='checkbox' id='event-allday' value='allday'/>";
 		} else if (detailInput == "from") {
@@ -610,6 +628,7 @@ function EventSlider(calendar, options) {
         $.mask.definitions['4']="[0-3]";
         $.mask.definitions['6']="[0-5]";
     
+        /* start date */
 		$("#event-time-start").datetimepicker({
 		    ampm: true,hourGrid: 12,
 		    minuteGrid: 10,
@@ -620,6 +639,8 @@ function EventSlider(calendar, options) {
 		}).mask("29/49/9999 29:69 hi", {
 		    placeholder: 'mm/dd/yyyy hh:mm am'
   		});
+  		
+  		/* finish date */
 		$("#event-time-finish").datetimepicker({
 		    ampm: true,
 		    hourGrid: 12,
@@ -630,6 +651,23 @@ function EventSlider(calendar, options) {
 		    }
 		}).mask("29/49/9999 29:69 hi", {
 		    placeholder: 'mm/dd/yyyy hh:mm am'
+  		});
+  		
+  		/* repeating end date */
+  		$("#event-end-repeat-date").datetimepicker({
+		    onSelect: function (input) {
+		        var endDate = getDateFromInput(input, true);
+		        if (currentEvent.repeatStartDate && 
+		                endDate < currentEvent.repeatStartDate) {
+		            endDate = currentEvent.repeatEndDate || currentEvent.repeatStartDate;
+		            $('#event-end-repeat-date').val(formatDate(endDate, true));
+		            $("#event-end-repeat-date").datetimepicker("setDate", endDate);
+		        }
+		        currentEvent.setEndDate = endDate;
+		    },
+		    showTimepicker: false
+		}).mask("29/49/9999", {
+		    placeholder: 'mm/dd/yyyy'
   		});
   	}
 	
@@ -664,6 +702,7 @@ function EventSlider(calendar, options) {
         }
         date.setFullYear(year, month-1, day);
         allDay ? date.setHours(0, 0) : date.setHours(hour, mins);
+        date.setSeconds(0);
 
         return date;
 	}
@@ -790,14 +829,17 @@ function EventSlider(calendar, options) {
                    if (name == "start" || name == "end") {
                        if (currentEvent[name].toString() != originalEvent[name].toString()) {
                            if (name == "start") updatedEvent.start = currentEvent.start.toString();
-                           if (name == "end") updatedEvent.end = currentEvent.end.toString();
+                           else if (name == "end") updatedEvent.end = currentEvent.end.toString();
                        }
-                   } else {
-                       if (currentEvent[name] != originalEvent[name]) {
-                           if (name == "allday") updatedEvent.allday = currentEvent.allDay ? true : false;
-                           else if (name == "color") updatedEvent.color = rgb2hex(currentEvent.color);
-                           else updatedEvent[name] = currentEvent[name];
+                   } else if (name == "repeatStartDate" || name == "repeatEndDate") {
+                       if (!originalEvent[name] || currentEvent[name].toDateString() != originalEvent[name].toDateString()) {
+                           if (name == "repeatStartDate") updatedEvent.repeatStartDate = currentEvent.repeatStartDate.toString();
+                           else if (name == "repeatEndDate") updatedEvent.repeatEndDate = currentEvent.repeatEndDate.toString(); 
                        }
+                   } else if (currentEvent[name] != originalEvent[name]) {
+                       if (name == "allday") updatedEvent.allday = currentEvent.allDay ? true : false;
+                       else if (name == "color") updatedEvent.color = rgb2hex(currentEvent.color);
+                       else updatedEvent[name] = currentEvent[name];
                    }
                }
            }
@@ -1004,7 +1046,7 @@ function EventSlider(calendar, options) {
             return this;
         }
 
-            //show correct title
+        //show correct title
         if (event.beingCreated) {
             if (event.title || event.title === "") {
                 $('#event-title').val(event.title);
@@ -1037,10 +1079,15 @@ function EventSlider(calendar, options) {
             if (event.repeating == 3) $("#event-repeat").val('every-month');
             if (event.repeating == 4) $("#event-repeat").val('every-year'); 
            
-           //TODO - implement repeating option (never or end date)
             $("#end-repeat-option").parent().parent().show();
-            $("#end-repeat-option").val('never');
-            $("#event-end-repeat-date").hide();
+            if (event.repeatEndDate) {
+                $("#end-repeat-option").val('on-date');
+                $("#event-end-repeat-date").show();
+                $('#event-end-repeat-date').val(formatDate(event.repeatEndDate, true));
+            } else {
+                $("#end-repeat-option").val('never');
+                $("#event-end-repeat-date").hide();   
+            }
         } else {
             $("#event-repeat").val('none');
             $("#end-repeat-option").parent().parent().hide();
