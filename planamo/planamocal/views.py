@@ -57,20 +57,24 @@ def jsonfeed(request):
             repeating_event = event.repeatingevent
             interval = repeating_event.repeat_interval
             if interval == 1:   # daily repeat
-                json_repeating_events_fixed(start_date=start_date,
-                    end_date=end_date,event=event, user=request.user, data=data)
+                json_repeating_events_fixed(start_date=start_date, event=event,
+                    end_date=end_date, attendance = attendance,
+                    user=request.user, data=data)
             elif interval == 2: # weekly repeat
-                json_repeating_events_fixed(start_date=start_date,
-                    end_date=end_date,event=event, user=request.user, data=data)
+                json_repeating_events_fixed(start_date=start_date, event=event,
+                    end_date=end_date, attendance = attendance,
+                    user=request.user, data=data)
             elif interval == 3: # monthly repeat
-                json_repeating_events_notfixed(start_date=start_date,
-                    end_date=end_date,event=event, user=request.user, data=data)
+                json_repeating_events_notfixed(start_date=start_date, data=data,
+                    event=event, end_date=end_date, attendance = attendance,
+                    user=request.user)
             elif interval == 4: # yearly repeat
-                json_repeating_events_notfixed(start_date=start_date,
-                    end_date=end_date,event=event, user=request.user, data=data)
+                json_repeating_events_notfixed(start_date=start_date, data=data,
+                    event=event, end_date=end_date, attendance = attendance,
+                    user=request.user)
     return HttpResponse(simplejson.dumps(data), mimetype='application/json')
 
-def append_repeating_json(data, event, user, interval, timestamp):
+def append_repeating_json(data, event, attendance, user, interval, timestamp):
     """
     HELPER FUNCTION
     This function appends an event JSON object to the given JSON data list
@@ -90,6 +94,8 @@ def append_repeating_json(data, event, user, interval, timestamp):
         fromtimestamp(timestamp+length, pytz.utc).
         astimezone(user_timezone).isoformat())
     json_object['repeating'] = interval
+    json_object['color'] = attendance.color
+    json_object['notes'] = attendance.notes
     data.append(json_object)
 
 def json_repeating_events_fixed(**kwarg):
@@ -102,6 +108,7 @@ def json_repeating_events_fixed(**kwarg):
     end_date = kwarg['end_date']
     user = kwarg['user']
     data = kwarg['data']
+    attd = kwarg['attendance']
     
     user_timezone = pytz.timezone(user.get_profile().timezone)
     repeating_event = event.repeatingevent
@@ -115,8 +122,6 @@ def json_repeating_events_fixed(**kwarg):
     
     event_start_ts = calendar.timegm(event.start_date.
         utctimetuple())
-    event_end_ts = calendar.timegm(event.end_date.
-        utctimetuple())
     request_start_ts = calendar.timegm(start_date.utctimetuple())
     request_end_ts = calendar.timegm(end_date.utctimetuple()) 
     
@@ -127,7 +132,12 @@ def json_repeating_events_fixed(**kwarg):
     
     # add event JSON objects to data until the end timestamp
     # (end of rendering, or repeating [whichever comes first])
-    end_ts = min(event_end_ts, request_end_ts)
+    if event.end_date is None:
+        end_ts = request_end_ts
+    else:
+        event_end_ts = calendar.timegm(event.end_date.
+            utctimetuple())
+        end_ts = min(event_end_ts, request_end_ts)
     exceptions = repeating_event.exception_set.all()
     exceptions_ts = []
     for exception in exceptions:
@@ -139,7 +149,8 @@ def json_repeating_events_fixed(**kwarg):
             rendered_event_ts += FIXED_INTERVAL
             continue
     
-        append_repeating_json(data, event, user, interval, rendered_event_ts)    
+        append_repeating_json(data, event, attd, user, interval,
+            rendered_event_ts)    
         rendered_event_ts += FIXED_INTERVAL
         
 def json_repeating_events_notfixed(**kwarg):
@@ -152,6 +163,7 @@ def json_repeating_events_notfixed(**kwarg):
     data = kwarg['data']
     start_date = kwarg['start_date']
     end_date = kwarg['end_date']
+    attd = kwarg['attendance']
     
     user_timezone = pytz.timezone(user.get_profile().timezone)
     repeating_event = event.repeatingevent
@@ -164,7 +176,10 @@ def json_repeating_events_notfixed(**kwarg):
     hour = event_start.hour
     minute = event_start.minute
     
-    end = min(event.end_date, end_date)
+    if event.end_date is None:
+        end = end_date
+    else:
+        end = min(event.end_date, end_date)
     end = end.astimezone(user_timezone)
     rendered_event_datetime = event.start_date
     
@@ -192,7 +207,7 @@ def json_repeating_events_notfixed(**kwarg):
         if attempt > end:
             break
         rendered_event_datetime = attempt
-        append_repeating_json(data, event, user, interval,
+        append_repeating_json(data, event, attd, user, interval,
             calendar.timegm(rendered_event_datetime.utctimetuple()))
         if interval == 3:
             month += 1
