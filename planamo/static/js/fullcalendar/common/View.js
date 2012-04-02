@@ -180,13 +180,14 @@ function View(element, calendar, viewName) {
 		var oldAllDay = event.allDay;
 		var eventId = event._id;
 		
+		/* TODO - break off 
 		if (event.repeating) {
 		    //TODO - change confirm message to custom choices
 		    var changeAll = confirm("Change for all future events? (Cancel to change for this event only)");
 		    if (!changeAll) {
 		        //Break off
 		    }
-		}
+		} */
 		
 		moveEvents(eventsByID[eventId], dayDelta, minuteDelta, allDay);
 		trigger(
