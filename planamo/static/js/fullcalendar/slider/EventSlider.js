@@ -910,7 +910,9 @@ function EventSlider(calendar, options) {
 	 * @return true if view is successful, false otherwise
 	 */
 	function viewEvent(event, forceCancel) {
-        if (currentEvent && event.id == currentEvent.id) return;
+        if (currentEvent && event.id == currentEvent.id &&
+        (!currentEvent.repeating || event.start.toString() == currentEvent.start.toString()))
+            return;
 
         if (currentEvent){ 
             // if currentEvent to view is being created
