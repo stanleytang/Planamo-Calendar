@@ -51,7 +51,8 @@ class Event(models.Model):
     allday = models.BooleanField(default=True)
     repeating = models.BooleanField(default=False)
     start_date = models.DateTimeField()
-    end_date = models.DateTimeField()
+    end_date = models.DateTimeField(null=True) # null only for repeating event
+                                               # that never ends
     
     # objects = EventManager()
     
@@ -95,6 +96,8 @@ class RepeatingEvent(Event):
         # only used with yearly (0 for other options)
     instance_start_time = models.TimeField() # stored in user's timezone
     instance_end_time = models.TimeField()   # stored in user's timezone
+    
+    # TODO implement save method that guarantees event.repeating = True
     
     
 class RepeatingEventException(models.Model):
