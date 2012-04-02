@@ -69,7 +69,10 @@ class Event(models.Model):
             localized_end = self.end_date
         else:
             localized_start = self.start_date.astimezone(event_tz)
-            localized_end = self.end_date.astimezone(event_tz)
+            if self.end_date is not None:
+                localized_end = self.end_date.astimezone(event_tz)
+            else:
+                localized_end = None
 
         return {
             'id': self.id,
@@ -78,7 +81,8 @@ class Event(models.Model):
             'allDay': self.allday,
             'repeating': self.repeating,
             'start': localized_start.isoformat(),
-            'end': localized_end.isoformat(),
+            'end': (localized_end.isoformat()
+                if localized_end is not None else None),
         }
     
     def __unicode__(self):
