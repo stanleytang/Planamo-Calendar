@@ -433,6 +433,8 @@ def updateEvent(request):
         # Get event
         try:
             event = Event.objects.get(id=eventID)
+            if event.repeating:
+                event = event.repeatingevent
         except ObjectDoesNotExist:
             message = {'success': False}
             print "Event doesn't exist in database"
@@ -448,7 +450,7 @@ def updateEvent(request):
             return HttpResponse(simplejson.dumps(message), 
                 mimetype='application/json')
         
-        #TODO - exceptions        
+        #TODO - exceptions, setting repeat to none     
                 
         # Get all day and repeating first to update start/end times
         try:
@@ -466,7 +468,7 @@ def updateEvent(request):
                         instance_end_time=event.end_date.time(), 
                         repeating=True, repeat_interval=repeating)
                 else:
-                    event.repeat_interval = repeating
+                    event.repeat_interval=repeating
         except:
             pass
             

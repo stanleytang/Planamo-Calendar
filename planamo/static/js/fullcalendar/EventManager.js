@@ -165,7 +165,6 @@ function EventManager(options, _sources) {
                                 if (events[i].id == cache[0].id) {
                                     //If repeating, check to make sure event has same time
                                     if (cache[0].repeating) {
-                                        debugger;
                                         var eventStartDate = parseDate(events[i].start);
                                         if (eventStartDate.getDate() == cache[0].start.getDate() &&
                                         eventStartDate.getMonth() == cache[0].start.getMonth() &&
