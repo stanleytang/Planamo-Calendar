@@ -487,7 +487,7 @@ function AgendaEventRenderer() {
 			revertDuration: opt('dragRevertDuration'),
 			start: function(ev, ui) {
 				trigger('eventDragStart', eventElement, event, ev, ui);
-				hideEvents(event, eventElement);
+				//hideEvents(event, eventElement);
 				origPosition = eventElement.position();
 				minuteDelta = prevMinuteDelta = 0;
 				hoverListener.start(function(cell, origCell, rowDelta, colDelta) {

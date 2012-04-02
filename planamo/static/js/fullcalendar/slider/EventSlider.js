@@ -847,7 +847,7 @@ function EventSlider(calendar, options) {
                        }
                    } else if (name == "repeatStartDate" || name == "repeatEndDate") {
                        //If one of the repeat end dates is 0
-                        if (originalEvent[name] === 0 || currentEvent[name] === 0) {
+                        if (originalEvent[name] == 0 || currentEvent[name] == 0) {
                             if (originalEvent[name] != currentEvent[name]) {
                                 updatedEvent[name] = currentEvent[name];
                             }
