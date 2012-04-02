@@ -50,8 +50,11 @@ class Event(models.Model):
     location = models.CharField(max_length=100, blank=True)
     allday = models.BooleanField(default=True)
     repeating = models.BooleanField(default=False)
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField()
+    
+    # In regular mode, indicates start and end time of event
+    # In repeating mode, indicates start and end date of repeating interval
+    start_date = models.DateTimeField() 
+    end_date = models.DateTimeField(null=True)
     
     # objects = EventManager()
     
