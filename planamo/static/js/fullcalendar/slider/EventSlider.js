@@ -867,7 +867,7 @@ function EventSlider(calendar, options) {
                        }
                    } else if (name == "repeatStartDate" || name == "repeatEndDate") {
                        //If one of the repeat end dates is 0
-                        if (originalEvent[name] === 0 || currentEvent[name] === 0) {
+                        if (originalEvent[name] == 0 || currentEvent[name] == 0) {
                             if (originalEvent[name] != currentEvent[name]) {
                                 updatedEvent[name] = currentEvent[name];
                             }
@@ -930,7 +930,9 @@ function EventSlider(calendar, options) {
 	 * @return true if view is successful, false otherwise
 	 */
 	function viewEvent(event, forceCancel) {
-        if (currentEvent && event.id == currentEvent.id) return;
+        if (currentEvent && event.id == currentEvent.id &&
+        (!currentEvent.repeating || event.start.toString() == currentEvent.start.toString()))
+            return;
 
         if (currentEvent){ 
             // if currentEvent to view is being created

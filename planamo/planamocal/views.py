@@ -318,10 +318,6 @@ def createEvent(request):
             newEvent = RepeatingEvent(title=title, location=location, 
                 allday=allday, repeating=True, start_date=repeatStartDate, 
                 end_date=repeatEndDate, repeat_interval=repeating)
-            if repeating == 3 or repeating == 4:
-                newEvent.instance_day_of_month = start_date.day
-                if repeating == 4:
-                    newEvent.instance_month = start_date.month
             # TODO - all day events that span 2 days or more
             newEvent.instance_start_time = start_date.time()
             newEvent.instance_length_in_min = (get_seconds_from_time(
@@ -436,6 +432,8 @@ def updateEvent(request):
         # Get event
         try:
             event = Event.objects.get(id=eventID)
+            if event.repeating:
+                event = event.repeatingevent
         except ObjectDoesNotExist:
             message = {'success': False}
             print "Event doesn't exist in database"
@@ -450,10 +448,31 @@ def updateEvent(request):
             print "Event doesn't exist in database"
             return HttpResponse(simplejson.dumps(message), 
                 mimetype='application/json')
-
-        # Update event from request object values
+        
+        #TODO - exceptions, setting repeat to none     
+                
+        # Get all day and repeating first to update start/end times
         try:
-            alldayKeyExtracted = False
+            allday = obj['allDay']
+            event.allday = get_boolean(allday)
+        except:
+            pass
+        try:
+            repeating = obj['repeating']
+            if not repeating == 0:
+                if not event.repeating:
+                    event = RepeatingEvent(event_ptr=event, title=event.title, 
+                        location=event.location, allday=event.allday, 
+                        instance_start_time=event.start_date.time(), 
+                        instance_end_time=event.end_date.time(), 
+                        repeating=True, repeat_interval=repeating)
+                else:
+                    event.repeat_interval=repeating
+        except:
+            pass
+            
+        # Get rest of values from reuqest object
+        try:
             for key in obj:
                 if key == 'eventID': 
                     pass
@@ -461,33 +480,42 @@ def updateEvent(request):
                     event.title = obj['title']
                 elif key == 'location':
                     event.location = obj.get('location', '')
-                elif key == 'allDay' and not alldayKeyExtracted:
-                    event.allday = get_boolean(obj['allDay'])
-                    alldayKeyExtracted = True
                 elif key == 'start':
-                    if not alldayKeyExtracted:
-                        try:
-                            event.allday = get_boolean(obj['allDay'])
-                        except KeyError:
-                            pass
-                        alldayKeyExtracted = True
                     user_timezone = \
                         pytz.timezone(request.user.get_profile().timezone)
                     start_date = adjustDateStringToTimeZone(user_timezone=user_timezone, 
                         date_string=obj['start'], allday=event.allday)
-                    event.start_date = start_date
+                    if event.repeating:
+                        event.instance_start_time = start_date.time()
+                    else:
+                        event.start_date = start_date
                 elif key == 'end':
-                    if not alldayKeyExtracted:
-                        try:
-                            event.allday = get_boolean(obj['allDay'])
-                        except KeyError:
-                            pass
-                        alldayKeyExtracted = True
                     user_timezone = \
                         pytz.timezone(request.user.get_profile().timezone)
                     end_date = adjustDateStringToTimeZone(user_timezone=user_timezone, 
                         date_string=obj['end'], allday=event.allday)
-                    event.end_date = end_date
+                    if event.repeating:
+                        event.instance_end_time = end_date.time()
+                    else:
+                        event.end_date = end_date
+                elif key == 'repeatStartDate':
+                    if event.repeating:
+                        user_timezone = \
+                            pytz.timezone(request.user.get_profile().timezone)
+                        repeatStartDate = adjustDateStringToTimeZone(user_timezone=user_timezone, 
+                            date_string=obj['repeatStartDate'], allday=event.allday)
+                        event.start_date = repeatStartDate
+                elif key == 'repeatEndDate':
+                    if event.repeating:
+                        repeatEndDateRaw = obj['repeatEndDate']
+                        if repeatEndDateRaw == "0":
+                            repeatEndDate = None
+                        else:
+                            user_timezone = \
+                                pytz.timezone(request.user.get_profile().timezone)
+                            repeatEndDate = adjustDateStringToTimeZone(user_timezone=user_timezone, 
+                                date_string=obj['repeatEndDate'], allday=event.allday)
+                            event.end_date = repeatEndDate
                 elif key == 'color':
                     attendance.color = obj['color'].lower()
                 elif key == 'notes':
@@ -499,11 +527,11 @@ def updateEvent(request):
             print "Error reading values from event json"
             return HttpResponse(simplejson.dumps(message),
                 mimetype='application/json')
-                
+       
         #Save
         event.save()
         attendance.save()
-        
+    
         message = {'success': True}    
     else:
         message = {'success': False}
