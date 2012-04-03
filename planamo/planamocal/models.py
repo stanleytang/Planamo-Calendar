@@ -82,7 +82,7 @@ class Event(models.Model):
             'repeating': self.repeating,
             'start': localized_start.isoformat(),
             'end': (localized_end.isoformat()
-                if localized_end is not None else None),
+                if localized_end is not None else 0),
         }
     
     def __unicode__(self):

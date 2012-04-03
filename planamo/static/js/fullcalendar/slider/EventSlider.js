@@ -171,7 +171,7 @@ function EventSlider(calendar, options) {
 		
 		/* repeating event callback */
 		$("#event-repeat").change(function() {
-            if (this.value != 'none' && currentEvent.beingCreated) {
+            if (this.value != 'none') {
                 //TODO - update repeating event rendering
                 if (this.value == 'every-day') currentEvent.repeating = 1;
                 else if (this.value == 'every-week') currentEvent.repeating = 2;
