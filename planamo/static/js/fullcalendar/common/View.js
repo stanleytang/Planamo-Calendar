@@ -86,7 +86,7 @@ function View(element, calendar, viewName) {
 	
 	
 	// report when view receives new events
-	function reportEvents(events) { // events are already normalized at this point
+	function reportEvents(events) { // events are already normalized at this pt
 		eventsByID = {};
 		var i, len=events.length, event;
 		for (i=0; i<len; i++) {

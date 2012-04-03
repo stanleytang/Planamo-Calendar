@@ -181,7 +181,6 @@ function EventManager(options, _sources) {
                                 }
                             }
                         }
-						
 						var res = applyAll(success, this, arguments);
 						if ($.isArray(res)) {
 							events = res;
@@ -288,7 +287,7 @@ function EventManager(options, _sources) {
 	
 	
 	function renderEvent(event, stick) {
-		var out = normalizeEvent(event); // return normalized event
+	    var out = normalizeEvent(event); // return normalized event
 		if (!event.source) {
 			if (stick) {
 				stickySource.events.push(event);
@@ -296,11 +295,11 @@ function EventManager(options, _sources) {
 			}
 			cache.push(event);
 		}
+		
 		reportEvents(cache);
 		
 		return event;
-	}
-	
+	}	
 	
 	function removeEvents(filter) {
 		if (!filter) { // remove all

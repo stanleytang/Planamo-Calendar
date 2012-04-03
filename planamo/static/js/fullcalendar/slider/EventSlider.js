@@ -171,8 +171,7 @@ function EventSlider(calendar, options) {
 		
 		/* repeating event callback */
 		$("#event-repeat").change(function() {
-            if (this.value != 'none' && currentEvent.beingCreated) {
-                //TODO - update repeating event rendering
+            if (this.value != 'none') {
                 if (this.value == 'every-day') currentEvent.repeating = 1;
                 else if (this.value == 'every-week') currentEvent.repeating = 2;
                 else if (this.value == 'every-month')
@@ -185,6 +184,10 @@ function EventSlider(calendar, options) {
                     $("#end-repeat-option").val('never');
                 updateEventEndRepeatOptions();
                 $("#end-repeat-option").parent().parent().show();
+                
+                
+                // dynamically display repeat events on screen
+                calendar.renderEvent(currentEvent, true);
             } else {
                 currentEvent.repeating = 0;
                 currentEvent.repeatStartDate = null;
