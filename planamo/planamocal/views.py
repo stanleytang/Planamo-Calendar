@@ -3,7 +3,7 @@ from planamocal.models import Calendar, Event, Attendance, RepeatingEvent
 from django.http import HttpResponse, Http404
 from django.template import RequestContext
 from django.utils import simplejson
-from datetime import datetime
+from datetime import datetime, timedelta
 import calendar
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
@@ -215,13 +215,6 @@ def json_repeating_events_notfixed(**kwarg):
         elif interval == 4:
             year += 1
 
-def get_seconds_from_time(time):
-    """
-    HELPER FUNCTION
-    Converts a datetime object into a representation in terms of seconds
-    """
-    return (time.hour*3600 + time.minute*60 + time.second)
-
 def get_boolean(value):
     """
     HELPER FUNCTION
@@ -283,6 +276,12 @@ def createEvent(request):
                 date_string=obj['start'], allday=allday)
             end_date = adjustDateStringToTimeZone(user_timezone=user_timezone, 
                 date_string=obj['end'], allday=allday)
+                
+            # If end date is before start date (i.e. some sort of error), 
+            # default to 60 mins
+            if calendar.timegm(end_date.utctimetuple()) < calendar.timegm(start_date.utctimetuple()):
+                end_date = start_date + timedelta(hours=1)
+                print "A newly created event has defaulted end time to 60 mins"
             
             color = obj['color'].lower()
             notes = obj.get('notes', '')
@@ -318,10 +317,9 @@ def createEvent(request):
             newEvent = RepeatingEvent(title=title, location=location, 
                 allday=allday, repeating=True, start_date=repeatStartDate, 
                 end_date=repeatEndDate, repeat_interval=repeating)
-            # TODO - all day events that span 2 days or more
             newEvent.instance_start_time = start_date.time()
-            newEvent.instance_length_in_min = (get_seconds_from_time(
-                end_date.time()) - get_seconds_from_time(start_date.time()))/60                  
+            newEvent.instance_length_in_min = (calendar.timegm(end_date.utctimetuple())
+                - calendar.timegm(start_date.utctimetuple()))/60              
         else:
             newEvent = Event(title=title, location=location, allday=allday,
                 start_date=start_date, end_date=end_date)
@@ -329,13 +327,13 @@ def createEvent(request):
 
         # Create attendance (map event to calendar)
         try:
-            calendar = request.user.calendar
+            userCalendar = request.user.calendar
         except ObjectDoesNotExist:
             print "Calendar doesn't exist"
             message = {'success': False}
             return HttpResponse(simplejson.dumps(message), 
                 mimetype='application/json')
-        attendance = Attendance(calendar=calendar, event=newEvent,
+        attendance = Attendance(calendar=userCalendar, event=newEvent,
             color=color, notes=notes)
         attendance.save()
         message = {'success': True, 'eventID': newEvent.id}
@@ -422,7 +420,7 @@ def updateEvent(request):
                 
         # Get calendar
         try:
-            calendar = request.user.calendar
+            userCalendar = request.user.calendar
         except ObjectDoesNotExist:
             print "Calendar doesn't exist"
             message = {'success': False}
@@ -442,20 +440,20 @@ def updateEvent(request):
         
         # Get attendance
         try: 
-            attendance = Attendance.objects.get(calendar=calendar, event=event)
+            attendance = Attendance.objects.get(calendar=userCalendar, event=event)
         except ObjectDoesNotExist:
             message = {'success': False}
             print "Event doesn't exist in database"
             return HttpResponse(simplejson.dumps(message), 
                 mimetype='application/json')
         
-        #TODO - exceptions, setting repeat to none     
+        #TODO - exceptions, setting repeat to none (is this even possible?)    
                 
         # Get all day and repeating first to update start/end times
         try:
             allday = obj['allDay']
             event.allday = get_boolean(allday)
-        except:
+        except KeyError:
             pass
         try:
             repeating = obj['repeating']
@@ -468,8 +466,39 @@ def updateEvent(request):
                         repeating=True, repeat_interval=repeating)
                 else:
                     event.repeat_interval=repeating
-        except:
-            pass
+        except KeyError:
+            pass 
+            
+        # If repeating event, update start and end times simultaneoulsy
+        if event.repeating:
+            # Assumes start and end date are either both passed in or none passed
+            # in from client side. Also assumes that if start and end date exists,
+            # the event instance is the very first event in repeat series
+            try:
+                startDateObj = obj['start']
+                user_timezone = \
+                    pytz.timezone(request.user.get_profile().timezone)
+                instance_start_date = adjustDateStringToTimeZone(user_timezone=user_timezone, 
+                    date_string=startDateObj, allday=event.allday)
+                    
+                endDateObj = obj['end']
+                user_timezone = \
+                    pytz.timezone(request.user.get_profile().timezone)
+                instance_end_date = adjustDateStringToTimeZone(user_timezone=user_timezone, 
+                    date_string=endDateObj, allday=event.allday)
+                    
+                event.instance_start_time = instance_start_date.time()
+                
+                if calendar.timegm(instance_end_date.utctimetuple()) < calendar.timegm(instance_start_date.utctimetuple()):
+                    instance_end_date = instance_start_date + timedelta(hours=1)
+                    print "A newly created event has defaulted end time to 60 mins"
+                        
+                event.instance_length_in_min = (calendar.timegm(instance_end_date.utctimetuple())
+                    - calendar.timegm(instance_start_date.utctimetuple()))/60
+                
+                event.start_date = instance_start_date
+            except KeyError:
+                pass
             
         # Get rest of values from reuqest object
         try:
@@ -480,24 +509,20 @@ def updateEvent(request):
                     event.title = obj['title']
                 elif key == 'location':
                     event.location = obj.get('location', '')
-                elif key == 'start':
-                    user_timezone = \
-                        pytz.timezone(request.user.get_profile().timezone)
-                    start_date = adjustDateStringToTimeZone(user_timezone=user_timezone, 
-                        date_string=obj['start'], allday=event.allday)
-                    if event.repeating:
-                        event.instance_start_time = start_date.time()
-                    else:
-                        event.start_date = start_date
                 elif key == 'end':
-                    user_timezone = \
-                        pytz.timezone(request.user.get_profile().timezone)
-                    end_date = adjustDateStringToTimeZone(user_timezone=user_timezone, 
-                        date_string=obj['end'], allday=event.allday)
-                    if event.repeating:
-                        event.instance_end_time = end_date.time()
-                    else:
+                    if not event.repeating:
+                        user_timezone = \
+                            pytz.timezone(request.user.get_profile().timezone)
+                        end_date = adjustDateStringToTimeZone(user_timezone=user_timezone, 
+                            date_string=obj['end'], allday=event.allday)
                         event.end_date = end_date
+                elif key == 'start':
+                    if not event.repeating:
+                        user_timezone = \
+                            pytz.timezone(request.user.get_profile().timezone)
+                        start_date = adjustDateStringToTimeZone(user_timezone=user_timezone, 
+                            date_string=obj['start'], allday=event.allday)
+                        event.start_date = start_date
                 elif key == 'repeatStartDate':
                     if event.repeating:
                         user_timezone = \
