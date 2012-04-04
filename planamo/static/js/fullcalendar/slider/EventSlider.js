@@ -192,6 +192,7 @@ function EventSlider(calendar, options) {
                 currentEvent.repeating = 0;
                 currentEvent.repeatStartDate = null;
                 currentEvent.repeatEndDate = null;
+                calendar.renderEvent(currentEvent, true);
                 $("#end-repeat-option").parent().parent().hide();
             }
         });
@@ -1005,9 +1006,11 @@ function EventSlider(calendar, options) {
                     created (isNewEventBeingCreated), and you don't want to remove it.
                     */
                 } else {
-                    calendar.isNewEventBeingCreated() &&
-                    calendar.removeEvents(calendar.isNewEventBeingCreated().id);
-                    calendar.endEventCreation();
+                    if (calendar.isNewEventBeingCreated()) {
+                        var id = calendar.isNewEventBeingCreated().id;
+                        calendar.endEventCreation();
+                        calendar.removeEvents(id);  
+                    } 
                 }
             }
         }
@@ -1089,6 +1092,9 @@ function EventSlider(calendar, options) {
             return this;
         }
 
+        // TODO test if this code addition works
+        // if (event.beingCreated) calendar.updateCreatedEvent(event);
+
         //show correct title
         if (event.beingCreated) {
             if (event.title || event.title === "") {
@@ -1129,7 +1135,7 @@ function EventSlider(calendar, options) {
             if (typeof(event.repeatEndDate)=='string') {
                 event.repeatEndDate = new Date(event.repeatEndDate);
             }
-           
+                       
             $("#end-repeat-option").parent().parent().show();
             if (event.repeatEndDate) {
                 $("#end-repeat-option").val('on-date');
@@ -1139,14 +1145,20 @@ function EventSlider(calendar, options) {
                 $("#end-repeat-option").val('never');
                 $("#event-end-repeat-date").hide();   
             }
+            
+            if (event.start < event.repeatStartDate) {
+                event.repeatStartDate = cloneDate(event.start);
+            }
+            
+            // TODO remove and replace with code addition todo above and test
+            if (event.beingCreated) calendar.updateCreatedEvent(event);
+            rerender = true;
         } else {
             $("#event-repeat").val('none');
             $("#end-repeat-option").parent().parent().hide();
         }
-
         showCorrectColorOptionTicked(event);
         showCorrectButtons();
-
         if(rerender) {
             calendar.rerenderEvents(event.id);
             calendar.unselect();
