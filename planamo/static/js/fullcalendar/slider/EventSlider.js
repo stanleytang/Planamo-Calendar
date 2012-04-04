@@ -141,17 +141,17 @@ function EventSlider(calendar, options) {
 		 	if (currentEvent) {
 				if ($(this).is('#event-title'))
 				    currentEvent.title = $(this).val();
-				if ($(this).is('#event-location'))
+				else if ($(this).is('#event-location'))
 				    currentEvent.location = $(this).val();
-				if ($(this).is('#event-notes'))
+				else if ($(this).is('#event-notes'))
 				    currentEvent.notes = $(this).val();
-				if ($(this).is('#event-time-start')) {
+				else if ($(this).is('#event-time-start'))
 			  	    setStartDate($(this).val());
-			    } else {
-				    if ($(this).is('#event-time-finish')) {
-			  	        setEndDate($(this).val());
-				    }
-			    }
+			    else if ($(this).is('#event-time-finish'))
+			  	    setEndDate($(this).val());
+				else if ($(this).is('#event-end-repeat-date'))
+				    setRepeatEndDate($(this).val());
+				    
 			    calendar.rerenderEvents(currentEvent.id);
 			}
 		});
@@ -208,14 +208,12 @@ function EventSlider(calendar, options) {
                 currentEvent.repeatEndDate = 0;
             } else {
                 $("#event-end-repeat-date").show();
-                if (!currentEvent.repeatEndDate) {
-                    $('#event-end-repeat-date').
-                        val(formatDate(currentEvent.end, true));
-                    currentEvent.repeatEndDate = currentEvent.end;
-                } else {
-                    $('#event-end-repeat-date').val(formatDate(currentEvent.repeatEndDate, true));
-                }
+                var input = formatDate(currentEvent.repeatEndDate ?
+                    currentEvent.repeatEndDate : currentEvent.end, true);
+                $("#event-end-repeat-date").val(input);
+                setRepeatEndDate(input);
             }
+            calendar.renderEvent(currentEvent, true);
         }
 		
 		/* event color selection callback */
@@ -434,12 +432,13 @@ function EventSlider(calendar, options) {
                 data: eventJSONObject,
                 success: function(data) {
                     if (data.success) {
+                        var oldID = currentEvent.id;
                         currentEvent._id = currentEvent.id = data.eventID;
                         calendar.unselect();
                         completeEventCreation();
 
                         textbox.resetTextbox(); 
-                        calendar.renderEvent(currentEvent, true); //TODO - render repeating
+                        calendar.renderEvent(currentEvent, true, oldID); //TODO - render repeating
                         $("#notification-box-container").show().delay(notificationBoxDelay).fadeOut();
                         $("#notification-content").html("Successfuly added event to calendar");
                     } else {
@@ -645,9 +644,37 @@ function EventSlider(calendar, options) {
 	        $('#event-time-start').val(formatDate(currentEvent.start, currentEvent.allDay));
 	        // ^ needed to deal with bug when changing time-picker options
 	    } else {
-	        $('#event-time-finish').val(formatDate(currentEvent.end, currentEvent.allDay));
+	        $('#event-time-finish').val(formatDate(currentEvent.end,
+	            currentEvent.allDay));
 	    }
-	}	
+	}
+	
+	/**
+	 * Function: setRepeatEndDate
+	 * --------------------------
+	 * Verifies and sets (if valid) repeat end date for an event
+	 *
+	 * @param input string to set repeat end date to
+	 * @return none
+	 */
+	function setRepeatEndDate(input) {
+        var endDate = getDateFromInput(input, true);
+        endDate.setHours(23);
+        endDate.setMinutes(59);
+        
+        if (currentEvent.repeatStartDate && endDate < 
+            currentEvent.repeatStartDate) {
+            
+            endDate = cloneDate(currentEvent.repeatEndDate || 
+                currentEvent.repeatStartDate);
+            $('#event-end-repeat-date').val(formatDate(endDate, true));
+            $("#event-end-repeat-date").datetimepicker("setDate", endDate);
+            endDate.setHours(23);
+            endDate.setMinutes(59);
+        }
+
+        currentEvent.repeatEndDate = endDate;
+	}
 	
 	
 	/**
@@ -693,15 +720,8 @@ function EventSlider(calendar, options) {
   		/* repeating end date */
   		$("#event-end-repeat-date").datetimepicker({
 		    onSelect: function (input) {
-		        var endDate = getDateFromInput(input, true);
-		        if (currentEvent.repeatStartDate && endDate < currentEvent.repeatStartDate) {
-		            endDate = currentEvent.repeatEndDate || currentEvent.repeatStartDate;
-		            $('#event-end-repeat-date').val(formatDate(endDate, true));
-		            $("#event-end-repeat-date").datetimepicker("setDate", endDate);
-		        }
-		        endDate.setHours(23);
-		        endDate.setMinutes(59);
-		        currentEvent.repeatEndDate = endDate;
+		        setRepeatEndDate(input);
+		        calendar.rerenderEvents(currentEvent.id);
 		    },
 		    showTimepicker: false
 		}).mask("29/49/9999", {

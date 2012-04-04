@@ -286,7 +286,7 @@ function EventManager(options, _sources) {
 	}
 	
 	
-	function renderEvent(event, stick) {
+	function renderEvent(event, stick, oldID) {
 	    var out = normalizeEvent(event); // return normalized event
 		if (!event.source) {
 			if (stick) {
@@ -294,6 +294,17 @@ function EventManager(options, _sources) {
 				event.source = stickySource;
 			}
 			cache.push(event);
+		}
+		
+		if (oldID) {
+		    // if the event's id got updated, need to update the event id's of
+		    // all related events (repeating)
+    		for (var i = 0; i < cache.length; i++) {
+    		    if (cache[i].id == oldID) {
+    		        cache[i]._id = cache[i].id = out.id;
+    		        cache[i].beingCreated = event.beingCreated;
+    		    }
+    		}
 		}
 		
 		reportEvents(cache);

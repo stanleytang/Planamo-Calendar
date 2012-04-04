@@ -145,11 +145,10 @@ function updateEventTimeToServer(event) {
 				agenda: 'h:mmt{ - h:mmt}'
 			},
 			select: function(start, end, allDay) {
-			  // get event title (or ask for one if event does not exist yet)
-			  var eventTitle = calendar.fullCalendar('isNewEventBeingCreated')
-			    && calendar.fullCalendar('isNewEventBeingCreated').title;
-
-				eventTitle = 'New Event';
+                // get event title (or ask for one if event does not exist yet)
+                var eventTitle = calendar.fullCalendar('isNewEventBeingCreated')
+			        && calendar.fullCalendar('isNewEventBeingCreated').title;
+				eventTitle = 'New Event'; // TODO wth is this line doing here?
 
 				// render event on calendar
 				var event = { title: eventTitle,
@@ -159,16 +158,19 @@ function updateEventTimeToServer(event) {
 				if (!calendar.fullCalendar('isNewEventBeingCreated')) {
 				  calendar.fullCalendar('slider').createAndViewEvent(event);
 				} else {
-				  var updates = { start: start, end: end, allDay: allDay };
-				  calendar.fullCalendar('updateCreatedEvent', updates);
-				  var updatedEvent = calendar.fullCalendar('isNewEventBeingCreated');
-				  slider.update(updatedEvent, true);
+                    var updates = { start: start, end: end, allDay: allDay };
+                    calendar.fullCalendar('updateCreatedEvent', updates);
+                    var updatedEvent =
+				        calendar.fullCalendar('isNewEventBeingCreated');
+				    slider.update(updatedEvent, true);
 				}
 			},
 			eventClick: function(event, jsEvent, view) {
 			  if (calendar.fullCalendar('isNewEventBeingCreated') &&  
-			      calendar.fullCalendar('isNewEventBeingCreated').id == event.id)
-			    return;
+              calendar.fullCalendar('isNewEventBeingCreated').id == event.id)
+			  {
+			      return;
+		      }
 			    // TODO deal with repeating event
 				slider.viewEvent(event);
 			},
@@ -196,8 +198,8 @@ function updateEventTimeToServer(event) {
 
 		/* Dynamically resize height for calendar and sidebar */
 		$(window).resize(function() {
-			$('#calendar').fullCalendar('option', 'height', getCalendarHeight());
-		  resizeSideBar();
+			$('#calendar').fullCalendar('option','height', getCalendarHeight());
+            resizeSideBar();
 			sidebar.resizeScrollBar();
 		});
 

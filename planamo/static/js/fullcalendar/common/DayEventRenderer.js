@@ -6,6 +6,7 @@ function DayEventRenderer() {
 	// exports
 	t.renderDaySegs = renderDaySegs;
 	t.resizableDayEvent = resizableDayEvent;
+	t.setupRepeatRendering = setupRepeatRendering;
 	
 	
 	// imports
@@ -38,8 +39,162 @@ function DayEventRenderer() {
 	
 	
 	/* Rendering
-	-----------------------------------------------------------------------------*/
-	
+	--------------------------------------------------------------------------*/
+	/**
+	  * Function: cloneEvent
+	  * --------------------
+	  * Clones an event
+	  * @param event to clone
+	  * @return cloned event
+	  */
+	 function cloneEvent(event) {
+	     var clone = $.extend({}, event);
+	     clone.start = event.start.clone();
+	     clone.end = event.end.clone();
+	     
+	     return clone;
+	 }
+	 
+	 /**
+	  * Function: generateRepeatInstances
+	  * ---------------------------------
+	  * Adds the repeat instances of the given repeating event to the events
+	  * array that occur starting from the given date (which is assumed to be 
+      * consistent with the repeating event's start time)
+	  *
+	  * @param repeating event to render instances of
+	  * @param events array to add instances to
+	  * @param start date to generate instances from
+	  * @param callback function that knows how to move to the next instance
+	  * @return none
+	  */
+     function generateRepeatInstances(e, events, start, startIncrementFn) {
+         var repeatEnd = e.repeatEndDate;
+         var length = +e.end - (+e.start); 
+         var end = new Date(+start + length);
+         while (!t.calendar.isFetchNeeded(start, end) &&
+             (!repeatEnd || end <= repeatEnd)) {
+             
+             var repeatInstance = cloneEvent(e);
+             repeatInstance.start = start;
+             repeatInstance.end = end;
+             events.push(repeatInstance);
+         
+             start = startIncrementFn(start);
+             end = new Date(+start + length);
+         }
+     }
+     
+     /**
+      * Function: generateFixedRepeat
+      * -----------------------------
+      * Adds the appropriate events to render to the given events array for a
+      * given repeating event with a fixed repeat interval (in milliseconds)
+      * 
+      * @param repeating event to generate repeat instances for
+      * @param events array to add repeat instances to
+      * @param milliseconds between each repeating event instance
+      * @return none
+      */
+     function generateFixedRepeat(repeatingEvent, events, millis) {
+         var startTime = +repeatingEvent.start;
+     
+         while (startTime < +t.visStart) {
+             startTime += millis;
+         }
+     
+         var start = new Date(startTime);
+         generateRepeatInstances(repeatingEvent, events, start,
+             function (start) {
+                 return new Date(+start + millis);
+             }
+         );
+         
+     }
+	 
+	function setupRepeatRendering(events){
+	    /* The renderer needs to render each repeat instance for a repeat event
+	       that has not been created serverside yet */
+	    var repeatingEvent = t.calendar.isNewEventBeingCreated();
+	    
+        if (repeatingEvent) {
+            // clean out repeating event instances in events array
+    	    for (var i = 0; i < events.length; i++) {
+    	        if (events[i].id == repeatingEvent.id) {
+    	            events.splice(i, 1);
+    	            i--;
+    	        }
+    	    }
+    	    
+    	    if (!repeatingEvent.repeating) {
+    	        // add original event back if it's not a repeating event
+    	        events.push(repeatingEvent);
+	        } else {
+	            var length = +repeatingEvent.end - (+repeatingEvent.start); 
+                    
+    	        switch (repeatingEvent.repeating) {
+    	            case 1:
+    	                var interval = 1000*3600*24; // millis in a day
+    	                generateFixedRepeat(repeatingEvent, events, interval);
+    	                break;
+                    case 2:
+                        var interval = 1000*3600*24*7 // millis in a week
+                        generateFixedRepeat(repeatingEvent, events, interval);
+                        break;
+                    case 3:
+                        var start = cloneDate(repeatingEvent.start);
+                        var day = repeatingEvent.start.getDate();
+
+                        while (+start < +t.visStart ||
+                            start.getDate() != day) {
+                                
+                            start.setMonth(start.getMonth()+1);
+                            start.setDate(day);
+                        }
+                    
+                        generateRepeatInstances(repeatingEvent, events, start,
+                            function (start) {
+                                start = cloneDate(start);
+                                var day = start.getDate();
+                                start.setMonth(start.getMonth()+1);
+                                while (start.getDate() != day) {
+                                    start.setMonth(start.getMonth()+1);
+                                    start.setDate(day);
+                                }
+                                return start;
+                            }
+                        );
+                        break;
+                    case 4:
+                        var start = cloneDate(repeatingEvent.start);
+                        var day = repeatingEvent.start.getDate();
+                        var month = repeatingEvent.start.getMonth();
+
+                        while (+start < +t.visStart ||
+                            start.getDate() != day) {
+                                
+                            start.setFullYear(start.getFullYear()+1);
+                            start.setDate(day);
+                            start.setMonth(month);
+                        }
+
+                        generateRepeatInstances(repeatingEvent, events, start,
+                            function (start) {
+                                start = cloneDate(start);
+                                start.setFullYear(++year);
+                                while (start.getDate() != day) {
+                                    start.setFullYear(++year);
+                                    start.setDate(day);
+                                    start.setMonth(month);
+                                }
+                                return start;
+                            }
+                        );
+                        break;
+    	        }
+	        }
+	    }	    
+	}
 	
 	function renderDaySegs(segs, modifiedEventId) {
 		var segmentContainer = getDaySegmentContainer();
