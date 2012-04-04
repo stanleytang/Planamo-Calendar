@@ -186,13 +186,85 @@ function View(element, calendar, viewName) {
         if (event.repeating && !event.beingCreated) {
             var changeAll = confirm("Click OK to change for all future events. Cancel for this event only");
 
+            //TODO - decomp code
+
             //Create unique event
             if (!changeAll) {
-                eventId = event._id = event.id = -1;
+                eventId = event._id = event.id = -1; 
+                //Change event times
+                minuteDelta = minuteDelta || 0;
+                if (allDay !== undefined) {
+    				event.allDay = allDay;
+    			}
+                addMinutes(addDays(event.start, dayDelta, true), minuteDelta);
+                addMinutes(addDays(event.end, dayDelta, true), minuteDelta);
                 
+                currentEvent = event;
+                
+                //Create new event
+    		    if (currentEvent.allDay) {
+    		        currentEvent.start.setHours(12);
+    		        currentEvent.end.setHours(13);
+    		    }
+    		    
+    		    /**
+            	 * Function: rgb2hex
+            	 * -----------------
+            	 * Outputs a HTML hex-formatted color given an rgb color string.
+            	 * This is a helper funtion for the AJAX call to be standardized to send
+            	 * always hex-formatted colors
+            	 *
+            	 * @param rgb string
+            	 * @return hex string
+            	 */
+            	function rgb2hex(rgb) {
+                     if (rgb.search("rgb") == -1) {
+                          return rgb;
+                     } else {
+                          rgb = 
+                            rgb.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+))?\)$/);
+                          function hex(x) {
+                               return ("0" + parseInt(x).toString(16)).slice(-2);
+                          }
+                          return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]); 
+                     }
+                }
+
+    		    //Create event json object
+    		    var eventJSONObject = {
+                    'title': currentEvent.title,
+                    'location': currentEvent.location,
+                    'allDay': currentEvent.allDay ? true : false,
+                    'start': currentEvent.start.toString(),
+                    'end': currentEvent.end.toString(),
+                    'notes': currentEvent.notes,
+                    'color': rgb2hex(currentEvent.color)
+                }
+                
+                $.ajax({
+                    type: 'POST',
+                    url: '/cal/createEvent/',
+                    data: eventJSONObject,
+                    success: function(data) {
+                        if (data.success) {
+                            var oldID = currentEvent.id;
+                            currentEvent._id = currentEvent.id = data.eventID;
+                            calendar.renderEvent(currentEvent, true, oldID);
+                            $("#notification-box-container").show().delay(notificationBoxDelay).fadeOut();
+                            $("#notification-content").html("Successfuly updated event to calendar");
+                        } else {
+                            $("#notification-box-container").show().delay(notificationBoxDelay).fadeOut();
+                            $("#notification-content").html("Error saving event");
+                        }
+                    },
+                    dataType: 'json'
+                });
+                
+                return;
+                
+                //TODO - add exception to repeating event
 
             //Change all future events
-            //TODO - change end dates as well (they move too)
             } else {
                 //If event is first instance in repeat series
                 if (event.start.toString() == event.repeatStartDate.toString()) {
@@ -242,8 +314,9 @@ function View(element, calendar, viewName) {
         moveEvents(eventsByID[eventId], dayDelta, minuteDelta, allDay);
 
         //if event is first instance in repeat series
-        if (eventInstanceIsFirst)
+        if (eventInstanceIsFirst) {
             event.repeatStartDate = new Date(event.start.toString());
+        }
 
         trigger(
             'eventDrop',

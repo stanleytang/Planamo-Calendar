@@ -31,6 +31,7 @@ function BasicEventRenderer() {
 	var getColCnt = t.getColCnt;
 	var renderDaySegs = t.renderDaySegs;
 	var resizableDayEvent = t.resizableDayEvent;
+	var setupRepeatRendering = t.setupRepeatRendering;
 	
 	
 	
@@ -52,126 +53,7 @@ function BasicEventRenderer() {
 	 }
 	
 	function renderEvents(events, modifiedEventId) {
-	    /* The renderer needs to render each repeat instance for a repeat event
-	       that has not been created serverside yet */
-	    /** BEGIN REPEAT RENDERING LOGIC **/
-	    var repeatingEvent = this.calendar.isNewEventBeingCreated();
-	    //var repeatingEvent = this.calendar.getHighlightedEvent();
-	    
-        if (repeatingEvent && repeatingEvent.repeating) {
-            // clean out repeating event instances in events array
-    	    for (var i = 0; i < events.length; i++) {
-    	        if (events[i].id == repeatingEvent.id) {
-    	            events.splice(i, 1);
-    	            i--;
-    	        }
-    	    }
-    	    var length = +repeatingEvent.end - (+repeatingEvent.start);
-            
-	        switch (repeatingEvent.repeating) {
-	            case 1:
-	                var INTERVAL = 1000*3600*24 // millis in a day
-	                var startTime = +repeatingEvent.start;
-	                
-	                while (startTime < +this.visStart) {
-	                    startTime += INTERVAL;
-	                }
-	                
-	                var start = new Date(startTime);
-	                var end = new Date(startTime + length);
-	                while (!this.calendar.isFetchNeeded(start, end)) {
-	                    var repeatInstance = cloneEvent(repeatingEvent);
-	                    repeatInstance.start = start;
-	                    repeatInstance.end = end;
-	                    events.push(repeatInstance);
-	                    
-	                    start = new Date(+start + INTERVAL);
-	                    end = new Date(+end + INTERVAL);
-	                }
-	                break;
-                case 2:
-                    var INTERVAL = 1000*3600*24*7 // millis in a week
-                    var startTime = +repeatingEvent.start;
-                
-                    while (startTime < +this.visStart) {
-                        startTime += INTERVAL;
-                    }
-                
-                    var start = new Date(startTime);
-                    var end = new Date(startTime + length);
-                    while (!this.calendar.isFetchNeeded(start, end)) {
-                        var repeatInstance = cloneEvent(repeatingEvent);
-                        repeatInstance.start = start;
-                        repeatInstance.end = end;
-                        events.push(repeatInstance);
-                    
-                        start = new Date(+start + INTERVAL);
-                        end = new Date(+end + INTERVAL);
-                    }
-                    break;
-                case 3:
-                    var start = cloneDate(repeatingEvent.start);
-                    var day = repeatingEvent.start.getDate();
-                    var month = repeatingEvent.start.getMonth();
-
-                    while (+start < +this.visStart || start.getDate() != day) {
-                        start.setMonth(++month);
-                        start.setDate(day);
-                        
-                        month = start.getMonth();
-                    }
-                    
-                    var end = new Date(+start + length);
-                    while (!this.calendar.isFetchNeeded(start, end)) {
-                        var repeatInstance = cloneEvent(repeatingEvent);
-                        repeatInstance.start = cloneDate(start);
-                        repeatInstance.end = end;
-                        events.push(repeatInstance);
-                        
-                        start.setMonth(++month);
-                        month = start.getMonth();
-                        while (start.getDate() != day) {
-                            start.setMonth(++month);
-                            month = start.getMonth();
-                            
-                            start.setDate(day);
-                        }
-                        end = new Date(+start + length);
-                    }
-                    break;
-                case 4:
-                    var start = cloneDate(repeatingEvent.start);
-                    var day = repeatingEvent.start.getDate();
-                    var month = repeatingEvent.start.getMonth();
-                    var year = repeatingEvent.start.getFullYear();
-
-                    while (+start < +this.visStart || start.getDate() != day) {
-                        start.setFullYear(++year);
-                        start.setDate(day);
-                        start.setMonth(month);
-                    }
-
-                    var end = new Date(+start + length);
-                    while (!this.calendar.isFetchNeeded(start, end)) {
-                        var repeatInstance = cloneEvent(repeatingEvent);
-                        repeatInstance.start = cloneDate(start);
-                        repeatInstance.end = end;
-                        events.push(repeatInstance);
-
-                        start.setFullYear(++year);
-                        while (start.getDate() != day) {
-                            start.setFullYear(++year);
-                            start.setDate(day);
-                            start.setMonth(month);
-                        }
-                        end = new Date(+start + length);
-                    }
-                    break;
-	        }
-	    }
-	    
-	    /** END REPEAT RENDERING LOGIC **/
-	    
+	    setupRepeatRendering(events);
 		reportEvents(events);
 		renderDaySegs(compileSegs(events), modifiedEventId);
 	}
