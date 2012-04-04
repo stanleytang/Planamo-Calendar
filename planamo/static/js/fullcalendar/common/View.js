@@ -180,26 +180,61 @@ function View(element, calendar, viewName) {
 	    var oldAllDay = event.allDay;
         var eventId = event._id;
 		
-        //TODO - break off 
+        //TODO - break off, compatible with slider
+        
+        //Current code assumes no slider
         if (event.repeating && !event.beingCreated) {
             var changeAll = confirm("Click OK to change for all future events. Cancel for this event only");
 
             //Create unique event
             if (!changeAll) {
+                eventId = event._id = event.id = -1;
+                
 
-
-                //Change all future events
+            //Change all future events
+            //TODO - change end dates as well (they move too)
             } else {
                 //If event is first instance in repeat series
                 if (event.start.toString() == event.repeatStartDate.toString()) {
-                    //event.repeatStartDate == event.start;
-                    alert("hi");
+                    var eventInstanceIsFirst = true;
 
-                    //If event is in middle of series, break off into two repeat series
+                //If event is in middle of series, break off into two repeat series
                 } else {
-
-
-                    //calendar.refetchEvents();
+                    var oldStart = new Date(event.start);
+                    oldStart.setHours(23);
+                    oldStart.setMinutes(59);
+                    
+                    //Change event times
+                    minuteDelta = minuteDelta || 0;
+                    if (allDay !== undefined) {
+        				event.allDay = allDay;
+        			}
+                    addMinutes(addDays(event.start, dayDelta, true), minuteDelta);
+                    addMinutes(addDays(event.end, dayDelta, true), minuteDelta);
+                    
+                    $.ajax({
+                		type: 'POST',
+                		url: '/cal/splitRepeatingEvents/',
+                		data: {
+                			'eventID': event.id,
+                			'newStart': event.start.toString(),
+                			'oldStart': oldStart.toString(),
+                			'newEnd': event.end.toString(),
+                			'allDay': event.allDay ? true : false,
+                		},
+                		success: function(data) {
+                			if (data.success) {
+                				calendar.refetchEvents();
+                				$("#notification-box-container").show().delay(notificationBoxDelay).fadeOut();
+                				$("#notification-content").html("Successfully updated event to calendar");
+                			} else {
+                				$("#notification-box-container").show().delay(notificationBoxDelay).fadeOut();
+                				$("#notification-content").html("Error updating event");
+                			}
+                		},
+                		dataType: 'json'
+                	});
+                	return;
                 }
             }
         } 
@@ -207,7 +242,8 @@ function View(element, calendar, viewName) {
         moveEvents(eventsByID[eventId], dayDelta, minuteDelta, allDay);
 
         //if event is first instance in repeat series
-        //event.repeatStartDate == event.start;
+        if (eventInstanceIsFirst)
+            event.repeatStartDate = new Date(event.start.toString());
 
         trigger(
             'eventDrop',

@@ -6,4 +6,5 @@ urlpatterns = patterns('planamocal.views',
 	url(r'^createEvent/$', 'createEvent'),
 	url(r'^deleteEvent/$', 'deleteEvent'),
 	url(r'^updateEvent/$', 'updateEvent'),
+	url(r'^splitRepeatingEvents/$', 'splitRepeatingEvents'),
 )

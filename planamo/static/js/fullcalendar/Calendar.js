@@ -316,10 +316,51 @@ function Calendar(element, options, eventSources) {
 	/* Event Fetching/Rendering
 	-----------------------------------------------------------------------------*/
 	
+	//Fetch events start date (should be earlier than visible start - allow room)
+	//Useful for repeating events rerendering
+	function fetchStartDate() {
+	    var newDate = new Date(currentView.visStart);
+	    
+	    //Fetch events one month before visible for month view
+	    if (currentView.name == "month") {
+	        return newDate.setDate(newDate.getDate() - 31);
+	    }
+	    
+	    //Fetch events one week before visible for week view
+	    if (currentView.name == "agendaWeek") {
+	        return newDate.setDate(newDate.getDate() - 7);
+	    }
+	    
+	    //Fetch events one day before for day view
+	    if (currentView.name == "agendaDay") {
+	        return newDate.setDate(newDate.getDate() - 1);
+	    }
+	}
+	
+	//Fetch events end date (should be later than visible end - allow room)
+	//Useful for repeating events rerendering
+	function fetchEndDate() {
+	    var newDate = new Date(currentView.visEnd);
+	    
+	    //Fetch events one month after visible for month view
+	    if (currentView.name == "month") {
+	        return newDate.setDate(newDate.getDate() + 31);
+	    }
+	    
+	    //Fetch events one week after visible for week view
+	    if (currentView.name == "agendaWeek") {
+	        return newDate.setDate(newDate.getDate() + 7);
+	    }
+	    
+	    //Fetch events one day after for day view
+	    if (currentView.name == "agendaDay") {
+	        return newDate.setDate(newDate.getDate() + 1);
+	    }
+	}
 	
 	// fetches events if necessary, rerenders events if necessary (or if forced)
 	function updateEvents(forceRender) {
-		if (!options.lazyFetching || isFetchNeeded(currentView.visStart, currentView.visEnd)) {
+		if (!options.lazyFetching || isFetchNeeded(new Date(fetchStartDate()), new Date(fetchEndDate()))) {
 			refetchEvents();
 		}
 		else if (forceRender) {
@@ -329,7 +370,7 @@ function Calendar(element, options, eventSources) {
 	
 	
 	function refetchEvents() {
-		fetchEvents(currentView.visStart, currentView.visEnd); // will call reportEvents
+		fetchEvents(new Date(fetchStartDate()), new Date(fetchEndDate())); // will call reportEvents
 	}
 	
 	

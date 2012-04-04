@@ -56,6 +56,7 @@ function BasicEventRenderer() {
 	       that has not been created serverside yet */
 	    /** BEGIN REPEAT RENDERING LOGIC **/
 	    var repeatingEvent = this.calendar.isNewEventBeingCreated();
+	    //var repeatingEvent = this.calendar.getHighlightedEvent();
 	    
         if (repeatingEvent && repeatingEvent.repeating) {
             // clean out repeating event instances in events array

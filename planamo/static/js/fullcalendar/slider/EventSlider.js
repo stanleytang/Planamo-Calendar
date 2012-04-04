@@ -212,6 +212,8 @@ function EventSlider(calendar, options) {
                     $('#event-end-repeat-date').
                         val(formatDate(currentEvent.end, true));
                     currentEvent.repeatEndDate = currentEvent.end;
+                    currentEvent.repeatEndDate.setHours(23);
+                    currentEvent.repeatEndDate.setMinutes(29);
                 } else {
                     $('#event-end-repeat-date').val(formatDate(currentEvent.repeatEndDate, true));
                 }

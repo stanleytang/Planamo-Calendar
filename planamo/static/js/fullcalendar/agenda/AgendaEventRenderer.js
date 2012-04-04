@@ -68,12 +68,12 @@ function AgendaEventRenderer() {
 	 }
 
 	function renderEvents(events, modifiedEventId) {
-	    //debugger;
 	    /* The renderer needs to render each repeat instance for a repeat event
 	       that has not been created serverside yet */
 	    /** BEGIN REPEAT RENDERING LOGIC **/
 
 	    var repeatingEvent = this.calendar.isNewEventBeingCreated();
+	    //var repeatingEvent = this.calendar.getHighlightedEvent();
 	    
         if (repeatingEvent) {
             // clean out repeating event instances in events array
