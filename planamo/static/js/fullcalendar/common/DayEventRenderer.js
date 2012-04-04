@@ -181,9 +181,9 @@ function DayEventRenderer() {
                         generateRepeatInstances(repeatingEvent, events, start,
                             function (start) {
                                 start = cloneDate(start);
-                                start.setFullYear(++year);
+                                start.setFullYear(start.getFullYear()+1);
                                 while (start.getDate() != day) {
-                                    start.setFullYear(++year);
+                                    start.setFullYear(start.getFullYear()+1);
                                     start.setDate(day);
                                     start.setMonth(month);
                                 }
