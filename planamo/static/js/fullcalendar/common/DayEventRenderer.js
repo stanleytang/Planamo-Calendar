@@ -453,7 +453,7 @@ function DayEventRenderer() {
 						if (oldHelpers) {
 							oldHelpers.remove();
 						}
-						hideEvents(event);
+						//hideEvents(event);
 					}else{
 						if (helpers) {
 							showEvents(event);

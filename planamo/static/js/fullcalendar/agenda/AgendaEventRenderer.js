@@ -68,9 +68,11 @@ function AgendaEventRenderer() {
 	 }
 
 	function renderEvents(events, modifiedEventId) {
+	    //debugger;
 	    /* The renderer needs to render each repeat instance for a repeat event
 	       that has not been created serverside yet */
 	    /** BEGIN REPEAT RENDERING LOGIC **/
+
 	    var repeatingEvent = this.calendar.isNewEventBeingCreated();
 	    
         if (repeatingEvent && repeatingEvent.repeating) {
@@ -183,7 +185,7 @@ function AgendaEventRenderer() {
                     }
                     break;
 	        }
-	    }
+	    } 
 	    
 	    /** END REPEAT RENDERING LOGIC **/
 	    
@@ -518,7 +520,7 @@ function AgendaEventRenderer() {
 			revertDuration: opt('dragRevertDuration'),
 			start: function(ev, ui) {
 				trigger('eventDragStart', eventElement, event, ev, ui);
-				hideEvents(event, eventElement);
+				//hideEvents(event, eventElement);
 				origWidth = eventElement.width();
 				hoverListener.start(function(cell, origCell, rowDelta, colDelta) {
 					clearOverlays();
@@ -706,7 +708,7 @@ function AgendaEventRenderer() {
 			grid: slotHeight,
 			start: function(ev, ui) {
 				slotDelta = prevSlotDelta = 0;
-				hideEvents(event, eventElement);
+				//hideEvents(event, eventElement);
 				eventElement.css('z-index', 9);
 				trigger('eventResizeStart', this, event, ev, ui);
 			},

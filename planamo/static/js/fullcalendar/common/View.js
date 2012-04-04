@@ -177,36 +177,55 @@ function View(element, calendar, viewName) {
 	
 	
 	function eventDrop(e, event, dayDelta, minuteDelta, allDay, ev, ui) {
-		var oldAllDay = event.allDay;
-		var eventId = event._id;
+	    var oldAllDay = event.allDay;
+        var eventId = event._id;
 		
-		/* TODO - break off 
-		if (event.repeating) {
-		    //TODO - change confirm message to custom choices
-		    var changeAll = confirm("Change for all future events? (Cancel to change for this event only)");
-		    if (!changeAll) {
-		        //Break off
-		    }
-		} */
-		
-		moveEvents(eventsByID[eventId], dayDelta, minuteDelta, allDay);
-		trigger(
-			'eventDrop',
-			e,
-			event,
-			dayDelta,
-			minuteDelta,
-			allDay,
-			function() {
-				// TODO: investigate cases where this inverse technique might not work
-				moveEvents(eventsByID[eventId], -dayDelta, -minuteDelta, oldAllDay);
-				reportEventChange(eventId);
-			},
-			ev,
-			ui
-		);
-		reportEventChange(eventId);
-	}
+        //TODO - break off 
+        if (event.repeating && !event.beingCreated) {
+            var changeAll = confirm("Click OK to change for all future events. Cancel for this event only");
+
+            //Create unique event
+            if (!changeAll) {
+
+
+                //Change all future events
+            } else {
+                //If event is first instance in repeat series
+                if (event.start.toString() == event.repeatStartDate.toString()) {
+                    //event.repeatStartDate == event.start;
+                    alert("hi");
+
+                    //If event is in middle of series, break off into two repeat series
+                } else {
+
+
+                    //calendar.refetchEvents();
+                }
+            }
+        } 
+        
+        moveEvents(eventsByID[eventId], dayDelta, minuteDelta, allDay);
+
+        //if event is first instance in repeat series
+        //event.repeatStartDate == event.start;
+
+        trigger(
+            'eventDrop',
+            e,
+            event,
+            dayDelta,
+            minuteDelta,
+            allDay,
+            function() {
+                // TODO: investigate cases where this inverse technique might not work
+                moveEvents(eventsByID[eventId], -dayDelta, -minuteDelta, oldAllDay);
+                reportEventChange(eventId);
+            },
+            ev,
+            ui
+        );
+        reportEventChange(eventId);
+    }
 	
 	
 	function eventResize(e, event, dayDelta, minuteDelta, ev, ui) {

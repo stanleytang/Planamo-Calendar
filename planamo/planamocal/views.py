@@ -459,10 +459,13 @@ def updateEvent(request):
             repeating = obj['repeating']
             if not repeating == 0:
                 if not event.repeating:
+                    instance_length_in_min = (calendar.timegm(event.end_date.utctimetuple())
+                        - calendar.timegm(event.start_date.utctimetuple()))/60
+                    
                     event = RepeatingEvent(event_ptr=event, title=event.title, 
                         location=event.location, allday=event.allday, 
                         instance_start_time=event.start_date.time(), 
-                        instance_end_time=event.end_date.time(), 
+                        instance_length_in_min=instance_length_in_min, 
                         repeating=True, repeat_interval=repeating)
                 else:
                     event.repeat_interval=repeating
@@ -471,34 +474,41 @@ def updateEvent(request):
             
         # If repeating event, update start and end times simultaneoulsy
         if event.repeating:
-            # Assumes start and end date are either both passed in or none passed
-            # in from client side. Also assumes that if start and end date exists,
-            # the event instance is the very first event in repeat series
+            # Assumes that if changes are being made to the times for repeating
+            # revents, the POST request object passes in the start and/or end
+            # times of the first event instance in the repeat series (since if
+            # it is in the middle of the series, that automatically become
+            # the first event in the series by "breaking off")
             try:
                 startDateObj = obj['start']
                 user_timezone = \
                     pytz.timezone(request.user.get_profile().timezone)
                 instance_start_date = adjustDateStringToTimeZone(user_timezone=user_timezone, 
                     date_string=startDateObj, allday=event.allday)
-                    
+            except KeyError:
+                instance_start_date = event.start_date
+                
+            event.instance_start_time = instance_start_date.time()
+            event.start_date = instance_start_date
+            
+            try:        
                 endDateObj = obj['end']
                 user_timezone = \
                     pytz.timezone(request.user.get_profile().timezone)
                 instance_end_date = adjustDateStringToTimeZone(user_timezone=user_timezone, 
                     date_string=endDateObj, allday=event.allday)
-                    
-                event.instance_start_time = instance_start_date.time()
-                
-                if calendar.timegm(instance_end_date.utctimetuple()) < calendar.timegm(instance_start_date.utctimetuple()):
-                    instance_end_date = instance_start_date + timedelta(hours=1)
-                    print "A newly created event has defaulted end time to 60 mins"
-                        
-                event.instance_length_in_min = (calendar.timegm(instance_end_date.utctimetuple())
-                    - calendar.timegm(instance_start_date.utctimetuple()))/60
-                
-                event.start_date = instance_start_date
             except KeyError:
-                pass
+                instance_end_date = instance_start_date + timedelta(minutes=event.instance_length_in_min)    
+                
+            if calendar.timegm(instance_end_date.utctimetuple()) < calendar.timegm(instance_start_date.utctimetuple()):
+                instance_end_date = instance_start_date + timedelta(hours=1)
+                print "A newly created event has defaulted end time to 60 mins"
+                    
+            event.instance_length_in_min = (calendar.timegm(instance_end_date.utctimetuple())
+                - calendar.timegm(instance_start_date.utctimetuple()))/60
+        
+        print event.start_date
+        print event.instance_length_in_min
             
         # Get rest of values from reuqest object
         try:
@@ -556,6 +566,9 @@ def updateEvent(request):
         #Save
         event.save()
         attendance.save()
+        
+        print event.start_date
+        print event.instance_length_in_min
     
         message = {'success': True}    
     else:

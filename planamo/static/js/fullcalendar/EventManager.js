@@ -36,6 +36,8 @@ function EventManager(options, _sources) {
 	var getView = t.getView;
 	var reportEvents = t.reportEvents;
 	
+	var slider = t.calendar.slider;
+	
 	
 	// locals
 	var stickySource = { events: [] };
@@ -155,13 +157,13 @@ function EventManager(options, _sources) {
 						cache = [];
 						
 						/* Add highlighted event to cache 
-						Assumes beingCreated events are also highlighted */
+						Assumes beingCreated events are also highlighted */			
 	                    if (prevHighlightedEvent) 
 	                        cache.push(prevHighlightedEvent);
 						
 						/* Remove highlighted event from json source
 						Assumes theres only one event in the cache */
-						if (cache[0]) {
+					    if (cache[0]) {
                             for (var i = 0; i < events.length; i++) {
                                 if (events[i].id == cache[0].id) {
                                     // If repeating, check to make sure event
@@ -486,7 +488,17 @@ function EventManager(options, _sources) {
 			event.className = [];
 		}
 		if (!event.color)	event.color = options.eventColor;
-		// TODO: if there is no start date, return false to indicate an invalid event
+		
+		//If repeating event, convert repeat interval date strings into date objects
+		if (event.repeating) {
+            if (typeof(event.repeatStartDate) =='string') {
+                event.repeatStartDate = new Date(event.repeatStartDate);
+            }
+            if (typeof(event.repeatEndDate) =='string') {
+                event.repeatEndDate = new Date(event.repeatEndDate);
+            }
+        }
+		
 		return event;
 	}
 	

@@ -29,6 +29,7 @@ function Calendar(element, options, eventSources) {
 	t.trigger = trigger;
 	t.slider = slider;
 	
+	
 	// imports
 	EventManager.call(t, options, eventSources);
 	var isFetchNeeded = t.isFetchNeeded;
