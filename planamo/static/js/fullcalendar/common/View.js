@@ -173,7 +173,7 @@ function View(element, calendar, viewName) {
 	
 	
 	/* Event Modification Reporting
-	---------------------------------------------------------------------------------*/
+	--------------------------------------------------------------------------*/
 	
 	
 	function eventDrop(e, event, dayDelta, minuteDelta, allDay, ev, ui) {
