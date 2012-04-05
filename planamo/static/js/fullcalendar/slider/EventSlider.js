@@ -438,7 +438,7 @@ function EventSlider(calendar, options) {
                         completeEventCreation();
 
                         textbox.resetTextbox(); 
-                        calendar.renderEvent(currentEvent, true, oldID); //TODO - render repeating
+                        calendar.renderEvent(currentEvent, true, oldID);
                         $("#notification-box-container").show().delay(notificationBoxDelay).fadeOut();
                         $("#notification-content").html("Successfuly added event to calendar");
                     } else {
@@ -488,7 +488,7 @@ function EventSlider(calendar, options) {
 		      close(null, true);
 		    }
 		});
-		deleteEventButton.click(function () { 
+		deleteEventButton.click(function () { 		    
 			if (confirm('Are you sure you want to delete this event?')) {
 				$.ajax({
 					type: 'POST',
@@ -896,6 +896,7 @@ function EventSlider(calendar, options) {
                                 updatedEvent[name] = currentEvent[name];
                             }
                         //If one of the repeat end dates is valid
+                        //TODO - set repeating back to none
                         } else if (!originalEvent[name] || currentEvent[name].toDateString() != originalEvent[name].toDateString()) {
                             if (name == "repeatStartDate") updatedEvent.repeatStartDate = currentEvent.repeatStartDate.toString();
                             else if (name == "repeatEndDate") updatedEvent.repeatEndDate = currentEvent.repeatEndDate.toString(); 
@@ -1147,15 +1148,7 @@ function EventSlider(calendar, options) {
             if (event.repeating == 2) $("#event-repeat").val('every-week');
             if (event.repeating == 3) $("#event-repeat").val('every-month');
             if (event.repeating == 4) $("#event-repeat").val('every-year'); 
-            
-            //Convert date strings into date objects
-            if (typeof(event.repeatStartDate)=='string') {
-                event.repeatStartDate = new Date(event.repeatStartDate);
-            }
-            if (typeof(event.repeatEndDate)=='string') {
-                event.repeatEndDate = new Date(event.repeatEndDate);
-            }
-                       
+
             $("#end-repeat-option").parent().parent().show();
             if (event.repeatEndDate) {
                 $("#end-repeat-option").val('on-date');

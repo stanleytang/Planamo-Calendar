@@ -29,13 +29,13 @@ function EventManager(options, _sources) {
 	t.createEvent = createEvent;
 	t.updateCreatedEvent = updateCreatedEvent;
 	t.highlightEvent = highlightEvent;
-	
+	t.getHighlightedEvent = getHighlightedEvent;
 	
 	// imports
 	var trigger = t.trigger;
 	var getView = t.getView;
 	var reportEvents = t.reportEvents;
-	
+
 	
 	// locals
 	var stickySource = { events: [] };
@@ -151,17 +151,45 @@ function EventManager(options, _sources) {
 					data: data,
 					success: function(events) {
 						events = events || [];
-						
-						cache = [];
-						
-						/* Add highlighted event to cache 
-						Assumes beingCreated events are also highlighted */
+	                        //debugger;
+	                  //  if (!prevHighlightedEvent || !(prevHighlightedEvent.repeating && !prevHighlightedEvent.beingCreated)) {
+	                        cache = [];
+	                  //  }
+	                    
+	                    /* Add highlighted event to cache 
+						Assumes beingCreated events are also highlighted */			
 	                    if (prevHighlightedEvent) 
 	                        cache.push(prevHighlightedEvent);
+	                        
+	                 
+	                    /*
+	                    if (cache) {
+	                        var eventsLength = events.length
+	                        for (var i = 0; i < eventsLength; i++) {
+	                                var cacheLength = cache.length;
+	                                for (var j = 0; j < cacheLength; j++) {
+	                                    if (events[i].id == cache[j].id) {
+	                                        var eventStartDate = parseDate(events[i].start);
+	                                        if (eventStartDate.getDate() == cache[j].start.getDate() &&
+                                            eventStartDate.getMonth() == cache[j].start.getMonth() &&
+                                            eventStartDate.getFullYear() == cache[j].start.getFullYear()) {
+                                                events.splice(i, 1);
+                                                cache.splice(j, 1);
+                                                j--;
+                                                cacheLength--;
+                                                i--;
+                                                eventsLength--;
+                                            }
+                                        }
+	                                }
+	                            }
+	                        }*/
+	                    
 						
 						/* Remove highlighted event from json source
 						Assumes theres only one event in the cache */
-						if (cache[0]) {
+			
+					    if (cache[0]) {
                             for (var i = 0; i < events.length; i++) {
                                 if (events[i].id == cache[0].id) {
                                     // If repeating, check to make sure event
@@ -181,6 +209,7 @@ function EventManager(options, _sources) {
                                 }
                             }
                         }
+                        
 						var res = applyAll(success, this, arguments);
 						if ($.isArray(res)) {
 							events = res;
@@ -373,6 +402,16 @@ function EventManager(options, _sources) {
 		if (!norender) this.render(); //efficiency?? 
 	}
 	
+	/**
+	 * Function: getHighlightedEvent
+	 * -------------------------------
+	 * Returns the highlighted event
+	 * @return highlighted event object
+	 */
+	 function getHighlightedEvent() {
+	     return prevHighlightedEvent;
+	 }
+	
 	
 	/* Loading State
 	--------------------------------------------------------------------------*/
@@ -497,7 +536,17 @@ function EventManager(options, _sources) {
 			event.className = [];
 		}
 		if (!event.color)	event.color = options.eventColor;
-		// TODO: if there is no start date, return false to indicate an invalid event
+		
+		//If repeating event, convert repeat interval date strings into date objects
+		if (event.repeating) {
+            if (typeof(event.repeatStartDate) =='string') {
+                event.repeatStartDate = new Date(event.repeatStartDate);
+            }
+            if (typeof(event.repeatEndDate) =='string') {
+                event.repeatEndDate = new Date(event.repeatEndDate);
+            }
+        }
+		
 		return event;
 	}
 	

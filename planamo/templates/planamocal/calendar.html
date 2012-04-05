@@ -103,6 +103,7 @@ function updateEventTimeToServer(event) {
 		},
 		success: function(data) {
 			if (data.success) {
+			    $('#calendar').fullCalendar('refetchEvents');
 				close(null, true);
 				$("#notification-box-container").show().delay(notificationBoxDelay).fadeOut();
 				$("#notification-content").html("Successfully updated event to calendar");

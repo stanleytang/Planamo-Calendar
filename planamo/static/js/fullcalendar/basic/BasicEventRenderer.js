@@ -120,7 +120,7 @@ function BasicEventRenderer() {
 			revertDuration: opt('dragRevertDuration'),
 			start: function(ev, ui) {
 				trigger('eventDragStart', eventElement, event, ev, ui);
-				hideEvents(event, eventElement);
+				//hideEvents(event, eventElement);
 				hoverListener.start(function(cell, origCell, rowDelta, colDelta) {
 					eventElement.draggable('option', 'revert', !cell || !rowDelta && !colDelta);
 					clearOverlays();
