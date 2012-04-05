@@ -1,6 +1,6 @@
 # Django settings for planamo project.
 
-DEBUG = True #set to false if want to see 404
+DEBUG = False #set to false if want to see 404
 TEMPLATE_DEBUG = DEBUG
 
 # Directory to project file
@@ -138,6 +138,9 @@ INSTALLED_APPS = (
 # DEFAULT_FROM_EMAIL = 'webmaster@localhost'
 REGISTRATION_OPEN = True
 
+ABSOLUTE_URL_OVERRIDES = {
+    'auth.user': lambda u: "/cal/",
+}
 
 AUTH_PROFILE_MODULE = 'accounts.UserProfile'
 

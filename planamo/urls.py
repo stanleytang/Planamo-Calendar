@@ -21,6 +21,8 @@ urlpatterns = patterns('',
     url(r'^accounts/register/$', register, {'backend':
         'registration.backends.simple.SimpleBackend','form_class':
         forms.UserRegistrationForm}, name='registration_register'),
+    url(r'^accounts/profile/$', 'django.views.generic.simple.redirect_to',
+        {'url': '/cal/'}),
     url(r'^accounts/', include('registration.backends.simple.urls')),
     url(r'^$', direct_to_template,
         { 'template': 'index.html' }, 'index'),
