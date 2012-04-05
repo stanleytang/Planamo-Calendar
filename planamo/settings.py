@@ -1,6 +1,6 @@
 # Django settings for planamo project.
 
-DEBUG = False #set to false if want to see 404
+DEBUG = True #set to false if want to see 404
 TEMPLATE_DEBUG = DEBUG
 
 # Directory to project file
