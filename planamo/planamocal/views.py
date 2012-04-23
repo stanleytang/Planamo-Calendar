@@ -13,9 +13,20 @@ from planamocal.utils import adjustDateStringToTimeZone, get_boolean
 from planamocal.utils import json_repeating_events_fixed
 from planamocal.utils import json_repeating_events_notfixed
 
+
+# Download the twilio-python library from http://twilio.com/docs/libraries
+from twilio.rest import TwilioRestClient
+
 @login_required
 def index(request):
     calendar = get_object_or_404(Calendar, id=request.user.calendar.id)
+    # Find these values at https://twilio.com/user/account
+    account_sid = 'AC985a08f454364ba38d9ac15000ee667c'
+    auth_token = '7cf60b7327c52fe5377e017af8d2de0e'    
+    client = TwilioRestClient(account_sid, auth_token)
+
+    message = client.sms.messages.create(to="+12316851234", from_="+15555555555",
+                                         body="Hello there!")
     
     return render_to_response(
         'planamocal/calendar.html',
@@ -83,13 +94,13 @@ def createEvent(request):
     Creates a new event mapped to calendar (through attendance). If success,
     returns JSON object with success = true and event ID. Otherwise, return
     JSON object with success = false
-
+    
     @param POST + AJAX request from client
     @return JSON object (success, eventID)
     """
     if request.is_ajax() and request.method == 'POST':
         obj = request.POST
-
+        
         # Read in event object
         try:
             title = obj['title']
@@ -138,7 +149,7 @@ def createEvent(request):
                 print "Error reading start and end dates of repeating event from JSON"
                 return HttpResponse(simplejson.dumps(message),
                     mimetype='application/json')
-
+                    
         # Save event
         if repeating:
             newEvent = RepeatingEvent(title=title, location=location, 
@@ -151,7 +162,7 @@ def createEvent(request):
             newEvent = Event(title=title, location=location, allday=allday,
                 start_date=start_date, end_date=end_date)
         newEvent.save()
-
+        
         # Create attendance (map event to calendar)
         try:
             userCalendar = request.user.calendar
@@ -172,8 +183,8 @@ def createEvent(request):
 def deleteEvent(request):
     """
     Delete attendance of user from event. If nobody is attending the event,
-    then event gets deleted. If success, returns JSON object with success = true.
-    Otherwise, return JSON object with success = false
+    then event gets deleted. If success, returns JSON object with
+    success = true. Otherwise, return JSON object with success = false
     
     @param POST + AJAX request from client
     @return JSON object (success)

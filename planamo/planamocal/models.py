@@ -104,7 +104,12 @@ class RepeatingEvent(Event):
     
     
 class RepeatingEventException(models.Model):
-    root_event = models.ForeignKey(RepeatingEvent, related_name='exception_set')
+    """
+    This model refers to the exceptions that are related to information about
+    the event iself.
+    """
+    root_event = models.ForeignKey(RepeatingEvent,
+        related_name='event_exception_set')
     supposed_start_date = models.DateTimeField()
     exception_event = models.OneToOneField(Event, null=True)
         # null if event exception was a delete
@@ -136,6 +141,21 @@ class Attendance(models.Model):
     event = models.ForeignKey(Event)
     color = models.CharField(max_length=7, choices=COLOR_CHOICES)
     notes = models.CharField(max_length=200, blank=True)
+    default_status = models.NullBooleanField(default=True) # null means maybe
+    
+    def __unicode__(self):
+        return "%s is attending %s" %(self.calendar.owner.username, self.event)
   
     class Meta(object):
         verbose_name_plural = "Attendance"
+        
+class AttendanceException(models.Model):
+    """
+    Model that says which instances (in a repeating event) override default
+    information from the regular Attendance model (e.g. attendance status)
+    """
+    root_attendance = models.ForeignKey(Attendance,
+        related_name='attendance_exception_set')
+    event_start_date = models.DateTimeField()
+    status = models.NullBooleanField() # null means maybe
+    

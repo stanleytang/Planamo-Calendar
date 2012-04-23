@@ -174,7 +174,28 @@ function View(element, calendar, viewName) {
 	
 	/* Event Modification Reporting
 	--------------------------------------------------------------------------*/
-	
+	/**
+	 * Function: rgb2hex
+	 * -----------------
+	 * Outputs a HTML hex-formatted color given an rgb color string.
+	 * This is a helper funtion for the AJAX call to be standardized to send
+	 * always hex-formatted colors
+	 *
+	 * @param rgb string
+	 * @return hex string
+	 */
+	function rgb2hex(rgb) {
+         if (rgb.search("rgb") == -1) {
+              return rgb;
+         } else {
+              rgb = 
+                rgb.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+))?\)$/);
+              function hex(x) {
+                   return ("0" + parseInt(x).toString(16)).slice(-2);
+              }
+              return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]); 
+         }
+    }
 	
 	function eventDrop(e, event, dayDelta, minuteDelta, allDay, ev, ui) {
 	    var oldAllDay = event.allDay;
@@ -207,29 +228,8 @@ function View(element, calendar, viewName) {
     		        currentEvent.end.setHours(13);
     		    }
     		    
-    		    /**
-            	 * Function: rgb2hex
-            	 * -----------------
-            	 * Outputs a HTML hex-formatted color given an rgb color string.
-            	 * This is a helper funtion for the AJAX call to be standardized to send
-            	 * always hex-formatted colors
-            	 *
-            	 * @param rgb string
-            	 * @return hex string
-            	 */
-            	function rgb2hex(rgb) {
-                     if (rgb.search("rgb") == -1) {
-                          return rgb;
-                     } else {
-                          rgb = 
-                            rgb.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+))?\)$/);
-                          function hex(x) {
-                               return ("0" + parseInt(x).toString(16)).slice(-2);
-                          }
-                          return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]); 
-                     }
-                }
-
+    		    // TODO need to create event exception (delete repeat instance)
+    		    
     		    //Create event json object
     		    var eventJSONObject = {
                     'title': currentEvent.title,

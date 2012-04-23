@@ -126,11 +126,16 @@ INSTALLED_APPS = (
 	'planamocal',
 	'accounts',
 	'registration',
+	'django_twilio',
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )
+
+TWILIO_ACCOUNT_SID = 'AC985a08f454364ba38d9ac15000ee667c'
+TWILIO_AUTH_TOKEN = '7cf60b7327c52fe5377e017af8d2de0e'
+TWILIO_DEFAULT_CALLERID = '14155992671'
 
 # ACCOUNT_ACTIVATION_DAYS = 2
 # LOGIN_REDIRECT_URL = '/'

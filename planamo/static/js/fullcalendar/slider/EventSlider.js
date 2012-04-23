@@ -488,16 +488,20 @@ function EventSlider(calendar, options) {
 		      close(null, true);
 		    }
 		});
+		
+		var deleteEventData = { 'eventID' = currentEvent.id };
+		if (currentEvent.repeating)
+		    deleteEventData['start'] = currentEvent.start.toString();
+		    
 		deleteEventButton.click(function () { 		    
 			if (confirm('Are you sure you want to delete this event?')) {
 				$.ajax({
 					type: 'POST',
 					url: '/cal/deleteEvent/',
-					data: {
-						'eventID': currentEvent.id
-					},
+					data: deleteEventData,
 					success: function(data) {
 						if (data.success) {
+							// TODO refetch event, not removeEvents
 							calendar.removeEvents(currentEvent.id);
 							close();
 							$("#notification-box-container").show().
