@@ -26,10 +26,10 @@ urlpatterns = patterns('',
     url(r'^accounts/', include('registration.backends.simple.urls')),
     url(r'^$', direct_to_template,
         { 'template': 'index.html' }, 'index'),
-    url(r'^sms/$', 'django_twilio.views.sms', {
-        'message': 'Yo!',
-        'to': '+14082216266',
-        'sender': '+14155992671' }),
+    # url(r'^sms/$', 'django_twilio.views.sms', {
+    #         'message': 'Yo!',
+    #         'to': '+14082216266',
+    #         'sender': '+14155992671' }),
     # serving static files - only to be used during development
     # TODO - django does not recommend serving static files off django,
     # instead, use some other web server

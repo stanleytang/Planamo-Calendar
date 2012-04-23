@@ -13,20 +13,9 @@ from planamocal.utils import adjustDateStringToTimeZone, get_boolean
 from planamocal.utils import json_repeating_events_fixed
 from planamocal.utils import json_repeating_events_notfixed
 
-
-# Download the twilio-python library from http://twilio.com/docs/libraries
-from twilio.rest import TwilioRestClient
-
 @login_required
 def index(request):
     calendar = get_object_or_404(Calendar, id=request.user.calendar.id)
-    # Find these values at https://twilio.com/user/account
-    account_sid = 'AC985a08f454364ba38d9ac15000ee667c'
-    auth_token = '7cf60b7327c52fe5377e017af8d2de0e'    
-    client = TwilioRestClient(account_sid, auth_token)
-
-    message = client.sms.messages.create(to="+12316851234", from_="+15555555555",
-                                         body="Hello there!")
     
     return render_to_response(
         'planamocal/calendar.html',
