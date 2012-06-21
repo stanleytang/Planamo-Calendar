@@ -39,4 +39,4 @@ cal/jsonfeed?start=Sun+Mar+25+2012+00%3A00%3A00+GMT-0700+(PDT)&end=Sun+Mar+25+20
 2. To create a local database compatible with the settings.py, be sure to create a database with the name "planamodb"
 3. This database is accessible from the command-line:
 
-        python manage.py dbshel
+        python manage.py dbshell
