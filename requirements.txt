@@ -5,3 +5,4 @@ wsgiref==0.1.2
 django-twilio==0.2
 pytz==2012b
 hg+https://bitbucket.org/ubernostrum/django-registration
+dj-database-url==0.2.0
