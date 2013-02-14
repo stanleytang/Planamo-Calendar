@@ -43,7 +43,7 @@ def json_repeating_events_fixed(**kwarg):
     
 
     if interval == 1:
-        FIXED_INTERVAL = 3600*24 # seconds in a day
+        FIXED_INTERVAL = 3600*24 # seconds in a day 
     elif interval == 2:
         FIXED_INTERVAL = 3600*24*7 # seconds in a week
     
