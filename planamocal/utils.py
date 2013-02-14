@@ -38,6 +38,7 @@ def json_repeating_events_fixed(**kwarg):
     
     user_timezone = pytz.timezone(user.get_profile().timezone)
     repeating_event = event.repeatingevent
+    print repeating_event
     interval = repeating_event.repeat_interval
     
 
@@ -64,7 +65,7 @@ def json_repeating_events_fixed(**kwarg):
         event_end_ts = calendar.timegm(event.end_date.
             utctimetuple())
         end_ts = min(event_end_ts, request_end_ts)
-    exceptions = repeating_event.exception_set.all()
+    exceptions = repeating_event.event_exception_set.all()
     exceptions_ts = []
     for exception in exceptions:
         exceptions_ts.append(calendar.timegm(exception.supposed_start_date.

@@ -488,12 +488,11 @@ function EventSlider(calendar, options) {
 		      close(null, true);
 		    }
 		});
-		
-		var deleteEventData = { 'eventID' = currentEvent.id };
-		if (currentEvent.repeating)
-		    deleteEventData['start'] = currentEvent.start.toString();
-		    
-		deleteEventButton.click(function () { 		    
+				    
+		deleteEventButton.click(function () { 	
+      var deleteEventData = { 'eventID' : currentEvent.id };
+      if (currentEvent.repeating)
+        deleteEventData['start'] = currentEvent.start.toString();	    
 			if (confirm('Are you sure you want to delete this event?')) {
 				$.ajax({
 					type: 'POST',
@@ -521,7 +520,7 @@ function EventSlider(calendar, options) {
 				return false;
 			}
 		});
-		
+	
 		//add to event buttons div
 		eventButtons.append(addEventButton, doneEventButton, 
 		    cancelEventButton, deleteEventButton);
